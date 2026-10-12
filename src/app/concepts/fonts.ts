@@ -32,3 +32,20 @@ export const familjen = Familjen_Grotesk({ subsets: ["latin"], display: "swap", 
 export const unbounded = Unbounded({ subsets: ["latin"], display: "swap", variable: "--font-unbounded" })
 export const youngSerif = Young_Serif({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-young-serif" })
 export const gloock = Gloock({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-gloock" })
+
+/** Concept D — Maison (couture ivory) */
+import { Bodoni_Moda, Jost } from "next/font/google"
+export const bodoni = Bodoni_Moda({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-bodoni",
+  axes: ["opsz"],
+})
+export const jost = Jost({ subsets: ["latin"], display: "swap", variable: "--font-jost" })
+
+/** Concept E — Nocturne (private club, after dark) */
+import { Gilda_Display, Hanken_Grotesk, Josefin_Sans } from "next/font/google"
+export const gilda = Gilda_Display({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-gilda" })
+export const josefin = Josefin_Sans({ subsets: ["latin"], display: "swap", variable: "--font-josefin" })
+export const hanken = Hanken_Grotesk({ subsets: ["latin"], display: "swap", variable: "--font-hanken" })

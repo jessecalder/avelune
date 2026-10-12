@@ -1,7 +1,25 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { concepts } from "./concepts"
-import { archivo, bricolage, cormorant, familjen, figtree, gabarito, gloock, inter, plexMono, sora, unbounded, youngSerif } from "./fonts"
+import {
+  archivo,
+  bodoni,
+  bricolage,
+  cormorant,
+  familjen,
+  figtree,
+  gabarito,
+  gilda,
+  gloock,
+  hanken,
+  inter,
+  josefin,
+  jost,
+  plexMono,
+  sora,
+  unbounded,
+  youngSerif,
+} from "./fonts"
 import "./sunlit/type/type-trial.css"
 
 export const metadata: Metadata = {
@@ -12,7 +30,7 @@ export const metadata: Metadata = {
 /** Switcher bar + font variables shared by every concept route. Not linked from the site. */
 export default function ConceptsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${cormorant.variable} ${inter.variable} ${bricolage.variable} ${figtree.variable} ${archivo.variable} ${plexMono.variable} ${gabarito.variable} ${sora.variable} ${familjen.variable} ${unbounded.variable} ${youngSerif.variable} ${gloock.variable}`}>
+    <div className={`${cormorant.variable} ${inter.variable} ${bricolage.variable} ${figtree.variable} ${archivo.variable} ${plexMono.variable} ${gabarito.variable} ${sora.variable} ${familjen.variable} ${unbounded.variable} ${youngSerif.variable} ${gloock.variable} ${bodoni.variable} ${jost.variable} ${gilda.variable} ${josefin.variable} ${hanken.variable}`}>
       <nav aria-label="Design concepts" className="sticky top-0 z-50 flex flex-wrap items-center gap-x-5 gap-y-1 bg-[#14181f] px-4 py-2 text-[13px] text-[#f3ede2]/80 sm:px-6">
         <Link href="/concepts" className="font-medium text-[#f3ede2] hover:underline">
           Concepts
