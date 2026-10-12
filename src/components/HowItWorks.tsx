@@ -1,13 +1,12 @@
 import { site } from "@/content/site"
 import { Container, Eyebrow, HeadlineText, Index, Rule } from "@/components/ui"
-import { Mark } from "@/components/Wordmark"
 
 export function HowItWorks() {
   const { howItWorks } = site
   return (
     <section id="how-it-works" aria-labelledby="how-heading" className="bg-bone py-24 lg:py-40">
       <Container>
-        <Mark className="text-ember" width={48} height={48} />
+        <Rule />
         <Eyebrow className="mt-6">{howItWorks.eyebrow}</Eyebrow>
         <h2
           id="how-heading"

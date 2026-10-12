@@ -1,8 +1,9 @@
 import type { SVGProps } from "react"
 
 /**
- * The mark: a bold crescent (ave·lune) with a swallow gliding out of its
- * hollow. Single colour, inherits currentColor, legible at 16px.
+ * The mark is still in development: the wordmark ships as type only
+ * (withMark defaults to false). The crescent-and-swallow sketch is kept
+ * here for when the logo work resumes.
  */
 export function Mark(props: SVGProps<SVGSVGElement>) {
   return (
@@ -26,7 +27,7 @@ type WordmarkProps = {
   withMark?: boolean
 }
 
-export function Wordmark({ className = "", size = 28, withMark = true }: WordmarkProps) {
+export function Wordmark({ className = "", size = 28, withMark = false }: WordmarkProps) {
   return (
     <span className={`inline-flex items-center gap-[0.4em] ${className}`} style={{ fontSize: size }}>
       {withMark && <Mark width={size * 0.92} height={size * 0.92} className="shrink-0" />}
