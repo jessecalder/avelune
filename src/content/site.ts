@@ -351,6 +351,26 @@ export const site = {
     ],
   },
 
+  deposit: {
+    title: "Hold your place",
+    eyebrow: "Founding families · refundable deposit",
+    intro:
+      "A fully refundable deposit holds your family's place on one 2027 journey for fourteen days while you decide. Nothing else is charged today.",
+    emailLabel: "Email address",
+    journeyLabel: "Which journey",
+    submit: "Continue to payment",
+    microcopy: "Payment is handled by Stripe. We never see your card details.",
+    closed: "Deposits are not open yet. Founding families hear first, by email.",
+    success: {
+      title: "Your place is held.",
+      body: "Your deposit has been received and your place is held for fourteen days. Reply to any email from us to release it and we will refund it in full. A receipt is on its way from Stripe.",
+    },
+    cancelled: {
+      title: "No charge was made.",
+      body: "Your place is not held. When you are ready, the deposit link in your email still works, and a person is one reply away.",
+    },
+  },
+
   credits: {
     title: "Photo credits",
     intro:
