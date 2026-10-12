@@ -23,6 +23,11 @@ export default function ConceptsIndex() {
               <Link href={`/concepts/${c.slug}`} className="mt-6 inline-flex h-12 items-center bg-ember px-5 font-medium text-bone hover:bg-ember-deep">
                 Open {c.name} →
               </Link>
+              {c.slug === "sunlit" ? (
+                <Link href="/concepts/sunlit/type" className="ml-4 inline-flex h-12 items-center text-ember underline-offset-4 hover:underline">
+                  Type trial →
+                </Link>
+              ) : null}
             </li>
           ))}
         </ol>
