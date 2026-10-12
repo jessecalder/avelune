@@ -39,5 +39,9 @@ export function Numeral({ children, className = "" }: { children: ReactNode; cla
 
 /** Two-digit index like "01". */
 export function Index({ n, className = "" }: { n: number; className?: string }) {
-  return <Numeral className={className}>{String(n).padStart(2, "0")}</Numeral>
+  return (
+    <span aria-hidden="true">
+      <Numeral className={className}>{String(n).padStart(2, "0")}</Numeral>
+    </span>
+  )
 }

@@ -1,3 +1,6 @@
+"use client"
+
+// Client component: next/image cannot receive a loader function from a server component.
 import Image, { type ImageLoaderProps, type ImageProps } from "next/image"
 import type { Photo as PhotoEntry } from "@/content/photos"
 

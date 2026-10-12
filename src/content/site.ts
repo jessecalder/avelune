@@ -19,6 +19,8 @@ export const site = {
     headline: { before: "Bring the children. Everything", accent: "else", after: "is handled." } as Headline,
     subhead:
       "Avelune takes six to ten families on one ten-day summer journey: the Basque coast around San Sebastián in July, or the highlands around Antigua, Guatemala, in August. Houses, guides, tables and transfers are arranged. Hosts run the mornings for every age from three to seventeen. Parents get real time off, and every evening ends at one long table.",
+    subheadMobile:
+      "Ten days. Six to ten families. Hosts for every age from three to seventeen. Parents get real time off, and every evening ends at one long table.",
     cta: "Request early access",
     microcopy:
       "Email only, for now. No pricing yet, no pressure. We will write once, when the first itineraries open, and not otherwise.",
@@ -353,6 +355,7 @@ export const site = {
     title: "Photo credits",
     intro:
       "The photographs on this site are by the photographers below, used under the Unsplash License while Avelune commissions its own photography.",
+    license: { before: "Photographs are used under the", linkLabel: "Unsplash License", url: "https://unsplash.com/license" },
   },
 } as const
 

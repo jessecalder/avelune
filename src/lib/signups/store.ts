@@ -61,7 +61,7 @@ export function getStore(): SignupStore {
   if (store) return store
   if (process.env.DATABASE_URL) {
     store = new PostgresStore()
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.NODE_ENV === "production" && process.env.SIGNUP_STORE !== "file") {
     // Fail loudly: a container filesystem is discarded on redeploy, so a file
     // store in production would silently lose every lead.
     throw new Error("[signups] DATABASE_URL must be set in production")
