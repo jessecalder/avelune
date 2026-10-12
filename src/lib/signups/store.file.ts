@@ -93,6 +93,7 @@ export class FileStore implements SignupStore {
       const rows = await this.readAll()
       const row = rows.find((r) => r.confirmToken === token)
       if (!row) return false
+      if (patch.name !== undefined) row.name = patch.name
       if (patch.childrenCount !== undefined) row.childrenCount = patch.childrenCount
       if (patch.childrenAges !== undefined) row.childrenAges = patch.childrenAges
       if (patch.destinations !== undefined) row.destinations = patch.destinations

@@ -19,6 +19,7 @@ export const JOIN_FIELDS = {
 
 export const ENRICH_FIELDS = {
   token: "token",
+  name: "name",
   childrenCount: "childrenCount",
   childrenAges: "childrenAges",
   /** Checkbox group; values from DESTINATION_OPTIONS. */

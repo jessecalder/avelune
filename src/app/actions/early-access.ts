@@ -128,8 +128,13 @@ export async function enrichSignup(
   try {
     const parsed = enrichSchema.safeParse({
       token: field(formData, ENRICH_FIELDS.token),
+      name: field(formData, ENRICH_FIELDS.name),
       childrenCount: field(formData, ENRICH_FIELDS.childrenCount),
-      childrenAges: field(formData, ENRICH_FIELDS.childrenAges),
+      // Age bands arrive as checkbox values; a plain text input also works.
+      childrenAges: formData
+        .getAll(ENRICH_FIELDS.childrenAges)
+        .filter((v): v is string => typeof v === "string" && v.trim() !== "")
+        .join(", "),
       destinations: formData
         .getAll(ENRICH_FIELDS.destinations)
         .filter((v): v is string => typeof v === "string"),

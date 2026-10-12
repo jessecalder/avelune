@@ -16,6 +16,7 @@ export type InsertInput = {
 }
 
 export type EnrichPatch = {
+  name?: string
   childrenCount?: number
   childrenAges?: string
   destinations?: DestinationValue[]

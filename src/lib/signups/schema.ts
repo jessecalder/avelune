@@ -84,6 +84,7 @@ const DESTINATION_VALUES = DESTINATION_OPTIONS.map((o) => o.value) as [
 
 export const enrichSchema = z.object({
   token: z.string().regex(/^[a-f0-9]{48}$/),
+  name: optionalText(80),
   childrenCount: z.preprocess(
     blankToUndefined,
     z.coerce.number().int().min(0).max(12).optional(),
