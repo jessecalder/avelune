@@ -1,4 +1,5 @@
 import {
+  index,
   integer,
   jsonb,
   pgEnum,
@@ -57,3 +58,59 @@ export const signups = pgTable(
 
 export type Signup = typeof signups.$inferSelect
 export type NewSignup = typeof signups.$inferInsert
+
+export const journey = pgEnum("journey", ["san-sebastian", "antigua"])
+
+export const reservationStatus = pgEnum("reservation_status", [
+  "pending",
+  "paid",
+  "refunded",
+  "expired",
+  "cancelled",
+])
+
+export const reservations = pgTable(
+  "reservations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    signupId: uuid("signup_id").references(() => signups.id, {
+      onDelete: "set null",
+    }),
+    email: text("email").notNull(),
+    emailKey: text("email_key").notNull(),
+    journey: journey("journey").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    currency: text("currency").notNull().default("usd"),
+    status: reservationStatus("status").notNull().default("pending"),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+    stripePaymentIntentId: text("stripe_payment_intent_id"),
+    stripeCustomerId: text("stripe_customer_id"),
+    holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    refundedAt: timestamp("refunded_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("reservations_checkout_session_idx").on(
+      t.stripeCheckoutSessionId,
+    ),
+    index("reservations_email_key_idx").on(t.emailKey),
+  ],
+)
+
+/** Stripe event ids already handled; the webhook's idempotency gate. */
+export const stripeEvents = pgTable("stripe_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+})
+
+export type Reservation = typeof reservations.$inferSelect
+export type NewReservation = typeof reservations.$inferInsert
