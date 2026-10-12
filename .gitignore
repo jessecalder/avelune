@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local signup store (dev fallback)
+/.data/
+
+# keep the template
+!.env.example
