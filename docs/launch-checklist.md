@@ -21,6 +21,7 @@ already done or can be done on request. Tick as you go.
 ## 3. Hosting
 
 - [ ] Owner: create the hosting project, Railway or Vercel (see the README Deploy section; `railway.json` is ready for Railway).
+- [ ] Owner: choose the design direction first: the current editorial site, or one of the three concepts at `/concepts` (Quiet Paper, Sunlit, Night Atlas). Claude then promotes the choice to `/` and removes the rest before launch.
 - [ ] Owner: set environment variables on the host: `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL` (the public origin, with https),
   `SIGNUP_IP_SALT` (any long random string), `SIGNUP_NOTIFY_EMAIL`, `RESEND_API_KEY`, `EMAIL_FROM`.
 - [ ] Owner: attach the custom domain and confirm HTTPS works.
