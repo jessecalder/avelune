@@ -20,17 +20,21 @@ already done or can be done on request. Tick as you go.
 
 ## 3. Hosting
 
-- [ ] Owner: create the hosting project, Railway or Vercel (see the README Deploy section; `railway.json` is ready for Railway).
-- [ ] Owner: choose the design direction first: the current editorial site, or one of the three concepts at `/concepts` (Quiet Paper, Sunlit, Night Atlas). Claude then promotes the choice to `/` and removes the rest before launch.
-- [ ] Owner: set environment variables on the host: `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL` (the public origin, with https),
-  `SIGNUP_IP_SALT` (any long random string), `SIGNUP_NOTIFY_EMAIL`, `RESEND_API_KEY`, `EMAIL_FROM`.
-- [ ] Owner: attach the custom domain and confirm HTTPS works.
+- [x] Claude (2026-10-13): hosting project created on Railway (`avelune`, services `web` + `Postgres`), GitHub
+  `jessecalder/avelune` linked for auto-deploys from `main`, staging URL https://web-production-d11ee.up.railway.app.
+- [x] Owner (2026-10-13): design direction chosen: Maison. Claude promotes it to `/`; the other concepts are removed before launch.
+- [ ] Owner: the GitHub repo was created as **public**. Make it private unless you want the code and copy visible:
+  `gh repo edit jessecalder/avelune --visibility private`.
+- [x] Claude: `DATABASE_URL` (linked to the Postgres service), `NEXT_PUBLIC_SITE_URL`, `SIGNUP_IP_SALT`, `SITE_NOINDEX=true` are set.
+- [ ] Owner: add the email variables once Resend is ready (step 5): `RESEND_API_KEY`, `EMAIL_FROM`, `SIGNUP_NOTIFY_EMAIL`.
+- [ ] Owner: attach the custom domain (`railway domain <your-domain> --service web` prints the DNS records) and confirm HTTPS works;
+  then set `NEXT_PUBLIC_SITE_URL` to it and remove `SITE_NOINDEX` at launch.
 - [ ] Claude: confirm `GET /api/health` returns `ok: true` and `store: "postgres"` on the live URL.
 
 ## 4. Postgres
 
-- [ ] Owner: create the database (Supabase, Neon or Railway Postgres) and copy its pooled connection string into `DATABASE_URL`.
-- [ ] Owner: run `pnpm db:migrate` against it (automatic on Railway through the pre-deploy step; manual on Vercel).
+- [x] Claude (2026-10-13): Railway Postgres provisioned in the project; `DATABASE_URL` references it.
+- [ ] Claude: confirm the pre-deploy migration ran (tables `signups`, `reservations`, `stripe_events` exist).
 - [ ] Owner: turn on automated backups and check the plan keeps them long enough.
 - [ ] Owner: submit a test signup on the live site and confirm the row appears (`pnpm signups:export`).
 
@@ -53,7 +57,9 @@ already done or can be done on request. Tick as you go.
 ## 7. Stripe
 
 - [ ] Owner: create the Stripe account and finish business verification (needs the entity and bank account from step 6).
-- [ ] Owner: copy the test-mode secret key into `STRIPE_SECRET_KEY`.
+- [ ] Owner: copy the test-mode secret key into `STRIPE_SECRET_KEY`. Hand keys over by writing them into `.env.local`
+  in the repo folder (gitignored) and telling Claude, who pushes them to Railway with `railway variable set`; or set them
+  yourself in the Railway dashboard under the `web` service. Never paste keys into chat.
 - [ ] Owner: create a webhook endpoint at `https://<domain>/api/stripe/webhook` subscribed to `checkout.session.completed`,
   `checkout.session.expired` and `charge.refunded`; copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
 - [ ] Owner: decide the deposit amount, currency and hold length, and set `DEPOSIT_AMOUNT_CENTS`, `DEPOSIT_CURRENCY`,

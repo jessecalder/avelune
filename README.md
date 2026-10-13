@@ -40,6 +40,14 @@ See `.env.example`. All optional in development.
 
 ## Deploy
 
+**Where it runs today.** GitHub `jessecalder/avelune` (branch `main`) deploys automatically to the Railway project
+`avelune` (workspace "jessecalder's Projects"): service `web` plus a `Postgres` service, staging URL
+https://web-production-d11ee.up.railway.app with `SITE_NOINDEX=true` until launch. Variables are managed with
+`railway variable set KEY=value --service web` from this directory (it is linked to the project) or in the Railway
+dashboard. Never paste secrets into chat or commit them: put them in `.env.local` and push them up with the CLI.
+
+The generic steps, for any host:
+
 1. Create a Postgres database and run `DATABASE_URL=... pnpm db:migrate` once.
 2. Set the environment variables above on the host (`NEXT_PUBLIC_SITE_URL` must be the public origin).
 3. Verify the sending domain in Resend and set `EMAIL_FROM` to e.g. `Avelune <hello@avelune.com>`.

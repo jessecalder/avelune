@@ -1,0 +1,56 @@
+/* Per-face corrections for the Maison type trial. These rules are unlayered,
+   so they win over Tailwind's layered utilities (including the inline
+   font-variation-settings arbitrary classes) without needing !important.
+   Faces with a single weight get it forced; faces without a true italic
+   keep the accent word upright rather than slanted by the browser. */
+
+[data-display="bodoni-tuned"] .font-display {
+  font-variation-settings: "opsz" 14;
+  font-weight: 500;
+}
+
+[data-display="playfair"] .font-display {
+  font-variation-settings: normal;
+}
+
+[data-display="prata"] .font-display {
+  font-variation-settings: normal;
+  font-weight: 400;
+}
+[data-display="prata"] em {
+  font-style: normal;
+}
+
+[data-display="marcellus"] .font-display {
+  font-variation-settings: normal;
+  font-weight: 400;
+}
+[data-display="marcellus"] em {
+  font-style: normal;
+}
+
+[data-display="libre-bodoni"] .font-display {
+  font-variation-settings: normal;
+  font-weight: 500;
+}
+
+[data-display="newsreader"] .font-display {
+  font-variation-settings: "opsz" 72;
+  font-weight: 400;
+}
+
+[data-display="cormorant"] .font-display {
+  font-variation-settings: normal;
+  font-weight: 600;
+}
+[data-display="cormorant"] h1.font-display {
+  font-size: clamp(3rem, 7vw, 7.25rem);
+}
+[data-display="cormorant"] .specimen-h1.font-display {
+  font-size: clamp(2.75rem, 6.6vw, 5.75rem);
+}
+
+[data-display="dm-serif"] .font-display {
+  font-variation-settings: normal;
+  font-weight: 400;
+}

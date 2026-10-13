@@ -28,6 +28,7 @@ import {
   dmSerif,
 } from "./fonts"
 import "./sunlit/type/type-trial.css"
+import "./maison/type/type-trial.css"
 
 export const metadata: Metadata = {
   title: "Design concepts",

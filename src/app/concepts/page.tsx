@@ -28,6 +28,11 @@ export default function ConceptsIndex() {
                   Type trial →
                 </Link>
               ) : null}
+              {c.slug === "maison" ? (
+                <Link href="/concepts/maison/type" className="ml-4 inline-flex h-12 items-center text-ember underline-offset-4 hover:underline">
+                  Type trial →
+                </Link>
+              ) : null}
             </li>
           ))}
         </ol>
