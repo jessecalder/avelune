@@ -5,8 +5,7 @@
     "buildCommand": "pnpm install --frozen-lockfile && pnpm build"
   },
   "deploy": {
-    "startCommand": "pnpm start",
-    "preDeployCommand": ["pnpm db:migrate"],
+    "startCommand": "pnpm db:migrate && pnpm start",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 120,
     "restartPolicyType": "ON_FAILURE"

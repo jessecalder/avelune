@@ -34,7 +34,7 @@ already done or can be done on request. Tick as you go.
 ## 4. Postgres
 
 - [x] Claude (2026-10-13): Railway Postgres provisioned in the project; `DATABASE_URL` references it.
-- [ ] Claude: confirm the pre-deploy migration ran (tables `signups`, `reservations`, `stripe_events` exist).
+- [x] Claude (2026-10-13): migrations applied; tables `signups`, `reservations`, `stripe_events` exist. Future migrations run at container start.
 - [ ] Owner: turn on automated backups and check the plan keeps them long enough.
 - [ ] Owner: submit a test signup on the live site and confirm the row appears (`pnpm signups:export`).
 

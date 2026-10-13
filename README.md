@@ -53,9 +53,11 @@ The generic steps, for any host:
 3. Verify the sending domain in Resend and set `EMAIL_FROM` to e.g. `Avelune <hello@avelune.com>`.
 4. Check `GET /api/health`: it returns `{ ok, store, deposits, version, time }`. `store` should read `postgres` in production.
 
-**Railway.** `railway.json` sets the build (`pnpm install --frozen-lockfile && pnpm build`), the start command, a
-`/api/health` healthcheck, and a pre-deploy step that runs `pnpm db:migrate`, so a bad migration fails the deploy
-before traffic moves. Migrations use `tsx`, a dev dependency; keep dev dependencies installed in the build image.
+**Railway.** `railway.json` sets the build (`pnpm install --frozen-lockfile && pnpm build`), a `/api/health`
+healthcheck, and a start command of `pnpm db:migrate && pnpm start`: migrations run every time a container starts
+(Drizzle skips the ones already applied), and a failing migration stops the container before it takes traffic.
+The pre-deploy hook was tried first and was not honoured on this service, which is why the migration lives in the
+start command. Migrations use `tsx`, a dev dependency; keep dev dependencies installed in the build image.
 `.node-version` pins Node 20.
 
 **Vercel.** Import the repo and set the variables. Vercel has no pre-deploy hook for this, so run
