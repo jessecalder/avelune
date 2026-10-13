@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { fraunces, instrumentSans } from "./fonts"
+import { jost, playfair } from "./fonts"
 import "./globals.css"
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${instrumentSans.variable}`} data-scroll-behavior="smooth">
+    <html lang="en" className={`${playfair.variable} ${jost.variable}`} data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   )

@@ -1,19 +1,11 @@
-import { Fraunces, Instrument_Sans } from "next/font/google"
+import { Jost, Playfair_Display } from "next/font/google"
 
-/**
- * Fraunces carries the brand: optical size 144 for display, SOFT 0 / WONK 0
- * for headlines (crisp), WONK 1 only in the wordmark. Axis tags are validated
- * by next/font and case-sensitive.
- */
-export const fraunces = Fraunces({
+/** Playfair Display is the display face (no optical-size axis); Jost is the text face. */
+export const playfair = Playfair_Display({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
-  variable: "--font-fraunces",
-  axes: ["opsz", "SOFT", "WONK"],
+  variable: "--font-playfair",
 })
 
-export const instrumentSans = Instrument_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-instrument-sans",
-})
+export const jost = Jost({ subsets: ["latin"], display: "swap", variable: "--font-jost" })

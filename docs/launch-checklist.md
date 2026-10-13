@@ -22,7 +22,7 @@ already done or can be done on request. Tick as you go.
 
 - [x] Claude (2026-10-13): hosting project created on Railway (`avelune`, services `web` + `Postgres`), GitHub
   `jessecalder/avelune` linked for auto-deploys from `main`, staging URL https://web-production-d11ee.up.railway.app.
-- [x] Owner (2026-10-13): design direction chosen: Maison. Claude promotes it to `/`; the other concepts are removed before launch.
+- [x] Owner (2026-10-13): design direction chosen: Maison. Claude promotes it to `/`; the other concepts are removed before launch. Maison promoted to /, other concepts removed (2026-10-13).
 - [ ] Owner: the GitHub repo was created as **public**. Make it private unless you want the code and copy visible:
   `gh repo edit jessecalder/avelune --visibility private`.
 - [x] Claude: `DATABASE_URL` (linked to the Postgres service), `NEXT_PUBLIC_SITE_URL`, `SIGNUP_IP_SALT`, `SITE_NOINDEX=true` are set.

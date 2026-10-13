@@ -12,6 +12,9 @@ Next.js 16.4 (App Router, Turbopack, **cacheComponents on**), React 19.3, TypeSc
 - Read `formData.get('field')` explicitly (`Object.fromEntries` includes `$ACTION_*` keys).
 - `next/image`: use `preload`, not `priority`; `fill` needs a `relative` parent and `sizes`; `images.qualities` is restricted to `[60, 75, 85]`. Unsplash photos go through the loader in `src/components/Photo.tsx` (never `plus.unsplash.com`).
 - Tailwind v4: tokens in `src/app/globals.css` `@theme`; next/font variables are referenced via `var(--font-…)`; custom utilities are `@utility` blocks (`display`, `display-italic`, `wordmark`, `eyebrow`, `measure`, `reveal`).
+- Type: Playfair Display (display, `--font-playfair`) and Jost (text, `--font-jost`). Playfair has no optical-size axis, so never add `font-variation-settings: 'opsz'` classes. `display` is weight 400, tight leading, balanced; `display-italic` is the italic accent; `wordmark` is uppercase and widely tracked; `eyebrow` is the 11px uppercase label.
+- Design register (Maison): ivory ground, charcoal ink, champagne `moon` as the only accent. No rounded corners, no shadows, hairlines only (`border-mist`, `border-ink/40`). Page sections live in `src/components/maison/`; reuse the `Micro`, `Words`, `H2` and `Body` primitives from `src/components/maison/primitives.tsx` and the `FORM_LIGHT` / `FORM_DARK` wrapper classes for signup-style forms. Inner pages use `PageShell`.
+- The type trial at `/type` (noindex) loads its own candidate fonts in `src/app/type/fonts.ts`; `ThemeOverride` swaps the display face there only.
 - Motion is CSS only (`animate-rise`, `animate-fade`, `animate-settle`, `reveal`). No JS animation libraries; respect `prefers-reduced-motion` (handled globally).
 - zod 4: `z.email()`, `{ error: '…' }`, `safeParse`.
 - Drizzle: `postgres(url, { prepare: false })`; `pnpm db:generate` needs no DB.

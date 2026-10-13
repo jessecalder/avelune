@@ -20,7 +20,7 @@ export function SignupSuccess({ token, variant }: Props) {
       <h2
         ref={headingRef}
         tabIndex={-1}
-        className={`font-display font-semibold text-[2rem] lg:text-[2.5rem] leading-[1.05] outline-none [font-variation-settings:'opsz'_48,'SOFT'_0,'WONK'_0] ${dark ? "text-bone" : "text-ink"}`}
+        className={`display text-[2rem] lg:text-[2.5rem] outline-none ${dark ? "text-bone" : "text-ink"}`}
       >
         {site.signup.success.headline}
       </h2>

@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og"
 import { photos } from "@/content/photos"
+import { site } from "@/content/site"
 
-export const alt = "Avelune — the summer your kids will tell their kids about"
+const headline = [site.hero.headline.before, site.hero.headline.accent, site.hero.headline.after].filter(Boolean).join(" ")
+export const alt = `${site.name} — ${headline}`
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -9,7 +11,7 @@ export const contentType = "image/png"
 async function heroDataUrl(): Promise<string | null> {
   try {
     const res = await fetch(
-      `https://images.unsplash.com/${photos.conchaBlueHour.src}?w=1200&h=630&fit=crop&q=55&fm=jpg`,
+      `https://images.unsplash.com/${photos.conchaFromIgueldo.src}?w=600&h=630&fit=crop&q=55&fm=jpg`,
       { cache: "force-cache" },
     )
     if (!res.ok) return null
@@ -23,29 +25,29 @@ async function heroDataUrl(): Promise<string | null> {
 
 export default async function OpengraphImage() {
   const hero = await heroDataUrl()
+  const { before, accent, after } = site.hero.headline
+  const headline = [before, accent, after].filter(Boolean).join(" ")
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: "#14181F" }}>
-        {hero ? (
-          <img src={hero} alt="" width={1200} height={630} style={{ position: "absolute", top: 0, left: 0, width: 1200, height: 630, objectFit: "cover" }} />
-        ) : null}
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "#F4F1EA" }}>
         <div
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: 1200,
-            height: 630,
+            width: "55%",
+            height: "100%",
             display: "flex",
-            background: "linear-gradient(to top, rgba(20,24,31,0.85), rgba(20,24,31,0.1))",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "64px",
           }}
-        />
-        <div style={{ position: "absolute", top: 56, left: 64, display: "flex", color: "#E8D9B5", fontSize: 40, letterSpacing: -1 }}>avelune</div>
-        <div style={{ position: "absolute", left: 64, bottom: 56, display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", color: "#E8D9B5", fontSize: 22, letterSpacing: 4 }}>SUMMER 2027 · SAN SEBASTIÁN · ANTIGUA</div>
-          <div style={{ display: "flex", marginTop: 20, maxWidth: 900, color: "#F3EDE2", fontSize: 72, fontWeight: 700, lineHeight: 1.0 }}>
-            The summer your kids will tell their kids about.
+        >
+          <div style={{ display: "flex", color: "#1A1A1A", fontSize: 28, letterSpacing: 10 }}>{site.name.toUpperCase()}</div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", width: 56, height: 1, background: "#D8C7A1" }} />
+            <div style={{ display: "flex", marginTop: 32, maxWidth: 560, color: "#1A1A1A", fontSize: 64, lineHeight: 1.05 }}>{headline}</div>
           </div>
+        </div>
+        <div style={{ width: "45%", height: "100%", display: "flex" }}>
+          {hero ? <img src={hero} alt="" width={540} height={630} style={{ width: 540, height: 630, objectFit: "cover" }} /> : null}
         </div>
       </div>
     ),

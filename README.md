@@ -100,7 +100,7 @@ all `noindex`, and `/deposit` shows the "not open yet" copy whenever deposits ar
 
 ## How the site is put together
 
-- `src/app/page.tsx` assembles the sections in `src/components/`.
+- `src/app/page.tsx` renders `MaisonPage`, which assembles the sections in `src/components/maison/`.
 - All copy lives in `src/content/site.ts`; all photography in `src/content/photos.ts`.
 - `src/components/Photo.tsx` renders manifest photos. Stage 1 hotlinks free
   Unsplash photos (Unsplash License); replace an entry's `src` with a local
@@ -108,8 +108,10 @@ all `noindex`, and `/deposit` shows the "not open yet" copy whenever deposits ar
 - Signups: `src/app/actions/early-access.ts` (server actions) →
   `src/lib/signups/` (validation, rate limiting, store adapters, email) →
   `src/db/schema.ts` (Drizzle table `signups`).
-- Fonts: Fraunces (display) + Instrument Sans (text) via `next/font`, tokens in
+- Fonts: Playfair Display (display) + Jost (text) via `next/font`, tokens in
   `src/app/globals.css` (`@theme`).
+- Type trial: `/type` (noindex) shows candidate display faces; `/type/<slug>` renders the full
+  page in one of them. Its extra fonts load only on those routes (`src/app/type/fonts.ts`).
 
 ## Roadmap
 

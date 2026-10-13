@@ -2,6 +2,7 @@
 
 import { useActionState, useId } from "react"
 import { createDepositCheckout } from "@/app/actions/deposits"
+import { FORM_LIGHT, MICRO_CLASS } from "@/components/maison/primitives"
 import { site } from "@/content/site"
 import { DEPOSIT_FIELDS, DEPOSIT_INITIAL } from "@/lib/deposits/types"
 
@@ -26,11 +27,11 @@ export function DepositForm({
   }
 
   return (
-    <form action={formAction} className="space-y-8">
+    <form action={formAction} className={`${FORM_LIGHT} [&_p]:text-left! space-y-10`}>
       {token ? <input type="hidden" name={DEPOSIT_FIELDS.token} value={token} /> : null}
 
       <div>
-        <label htmlFor={emailId} className="eyebrow mb-3 block text-stone">
+        <label htmlFor={emailId} className={`${MICRO_CLASS} mb-3 block text-stone`}>
           {site.deposit.emailLabel}
         </label>
         <input
@@ -42,17 +43,17 @@ export function DepositForm({
           inputMode="email"
           aria-invalid={hasError}
           aria-describedby={hasError ? `${errorId} ${microId}` : microId}
-          className="h-14 w-full border border-ink/25 bg-transparent px-4 text-ink placeholder:text-stone focus:border-ink focus:outline-none"
+          className="h-14 w-full rounded-none border-0 border-b border-ink/40 bg-transparent px-0 text-ink placeholder:text-stone focus:border-ink focus:outline-none"
         />
       </div>
 
       <fieldset>
-        <legend className="eyebrow mb-3 text-stone">{site.deposit.journeyLabel}</legend>
-        <div className="flex flex-col gap-3">
+        <legend className={`${MICRO_CLASS} mb-3 text-stone`}>{site.deposit.journeyLabel}</legend>
+        <div className="flex flex-col border-t border-mist">
           {journeys.map((j, i) => (
             <label
               key={j.id}
-              className="flex cursor-pointer items-center gap-4 border border-ink/25 px-4 py-4 has-[:checked]:border-ink has-[:checked]:bg-bone-deep"
+              className="flex cursor-pointer items-center gap-4 border-b border-mist py-5"
             >
               <input
                 type="radio"
@@ -60,11 +61,11 @@ export function DepositForm({
                 value={j.id}
                 required
                 defaultChecked={i === 0}
-                className="size-4 accent-ember"
+                className="size-4 accent-ink"
               />
               <span>
-                <span className="block font-medium text-ink">{j.label}</span>
-                <span className="block text-[0.9375rem] text-stone">{j.window}</span>
+                <span className={`${MICRO_CLASS} block text-ink`}>{j.label}</span>
+                <span className="block text-[0.9375rem] leading-[1.6] text-stone">{j.window}</span>
               </span>
             </label>
           ))}
@@ -76,7 +77,7 @@ export function DepositForm({
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="group inline-flex h-14 w-full items-center justify-center gap-3 bg-ember px-6 font-medium text-bone transition-colors hover:bg-ember-deep disabled:opacity-70 sm:w-auto"
+          className="group inline-flex h-14 w-full items-center justify-center gap-3 rounded-none bg-ember px-8 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-bone transition-colors hover:bg-ember-deep disabled:opacity-70 sm:w-auto"
         >
           {site.deposit.submit}
           <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
@@ -84,7 +85,7 @@ export function DepositForm({
           </span>
         </button>
         {hasError ? (
-          <p id={errorId} role="alert" className="mt-3 text-[0.8125rem] leading-[1.5] text-ember">
+          <p id={errorId} role="alert" className="mt-3 text-[0.8125rem] leading-[1.5] text-ink">
             {state.message}
           </p>
         ) : null}

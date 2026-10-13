@@ -6,7 +6,7 @@ const noindex = process.env.SITE_NOINDEX === "true"
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: noindex ? { userAgent: "*", disallow: "/" } : { userAgent: "*", allow: "/", disallow: ["/concepts", "/api/"] },
+    rules: noindex ? { userAgent: "*", disallow: "/" } : { userAgent: "*", allow: "/", disallow: ["/type", "/api/", "/deposit"] },
     sitemap: `${base}/sitemap.xml`,
   }
 }

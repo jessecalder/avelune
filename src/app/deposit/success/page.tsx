@@ -1,9 +1,8 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import Link from "next/link"
-import { Footer } from "@/components/Footer"
-import { Wordmark } from "@/components/Wordmark"
-import { Container } from "@/components/ui"
+import { Footer } from "@/components/maison/Footer"
+import { Nav } from "@/components/maison/Nav"
+import { PAGE_BODY_CLASS, PAGE_COLUMN_CLASS, PAGE_H1_CLASS, PAGE_MAIN_CLASS } from "@/components/PageShell"
 import { site } from "@/content/site"
 import { depositsEnabled } from "@/lib/deposits/config"
 import { getStripe } from "@/lib/stripe"
@@ -33,8 +32,8 @@ async function Outcome({ searchParams }: { searchParams: SearchParams }) {
   const copy = paid ? site.deposit.success : site.deposit.cancelled
   return (
     <>
-      <h1 className="display text-[clamp(2.5rem,5vw,4.5rem)] font-semibold text-ink">{copy.title}</h1>
-      <p className="measure mt-10 text-[1.0625rem] leading-[1.55] text-ink">{copy.body}</p>
+      <h1 className={PAGE_H1_CLASS}>{copy.title}</h1>
+      <p className={`${PAGE_BODY_CLASS} mt-10`}>{copy.body}</p>
     </>
   )
 }
@@ -44,19 +43,13 @@ export default function DepositSuccessPage(props: { searchParams: SearchParams }
   // so the same chrome is assembled directly around the dynamic part.
   return (
     <>
-      <header className="bg-bone">
-        <Container className="flex h-20 items-center">
-          <Link href="/" aria-label="Avelune home" className="text-ink">
-            <Wordmark size={28} />
-          </Link>
-        </Container>
-      </header>
-      <main id="main" className="bg-bone py-16 lg:py-24">
-        <Container>
+      <Nav />
+      <main id="main" className={PAGE_MAIN_CLASS}>
+        <div className={PAGE_COLUMN_CLASS}>
           <Suspense fallback={null}>
             <Outcome searchParams={props.searchParams} />
           </Suspense>
-        </Container>
+        </div>
       </main>
       <Footer />
     </>

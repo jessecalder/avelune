@@ -42,7 +42,7 @@ export function SignupForm({ source, variant, cta, microcopy, className = "" }: 
     return (
       <div className={`animate-fade ${className}`} role="status">
         <p
-          className={`font-display font-semibold text-[1.75rem] leading-[1.1] [font-variation-settings:'opsz'_48,'SOFT'_0,'WONK'_0] ${dark ? "text-bone" : "text-ink"}`}
+          className={`font-display text-[1.75rem] leading-[1.1] ${dark ? "text-bone" : "text-ink"}`}
         >
           {site.signup.already.headline}
         </p>

@@ -22,7 +22,7 @@ export function EnrichForm({ token, variant }: Props) {
     return (
       <div className="mt-6 animate-fade" role="status">
         <p
-          className={`font-display font-semibold text-[1.5rem] lg:text-[1.75rem] leading-[1.1] [font-variation-settings:'opsz'_48,'SOFT'_0,'WONK'_0] ${dark ? "text-bone" : "text-ink"}`}
+          className={`display text-[1.5rem] lg:text-[1.75rem] ${dark ? "text-bone" : "text-ink"}`}
         >
           {copy.saved.headline}
         </p>
@@ -108,7 +108,7 @@ export function EnrichForm({ token, variant }: Props) {
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="group inline-flex h-14 items-center justify-center gap-3 bg-ember px-6 font-medium text-bone transition-colors hover:bg-ember-deep disabled:opacity-70"
+          className="group inline-flex h-14 items-center justify-center gap-3 bg-ember px-8 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-bone transition-colors hover:bg-ember-deep disabled:opacity-70"
         >
           {pending ? site.signup.submitting : copy.submit}
           <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
