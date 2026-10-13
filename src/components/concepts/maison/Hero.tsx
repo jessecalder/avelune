@@ -9,13 +9,14 @@ export function Hero() {
   const { hero } = site
   return (
     <section aria-labelledby="mm-hero-title">
-      <div className="relative flex min-h-[100svh] items-end justify-center overflow-hidden bg-ink">
+      <div className="relative flex min-h-[calc(100svh-6rem)] items-center justify-center overflow-hidden bg-ink">
         <div className="absolute inset-0 animate-settle">
           <Photo photo={photos.conchaFromIgueldo} preload sizes="100vw" />
         </div>
-        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink/80 via-ink/75 via-60% to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-ink/45" />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink/70 via-ink/35 via-55% to-transparent" />
         <div aria-hidden="true" className="absolute inset-x-0 top-0 h-3 bg-bone" />
-        <div className="animate-fade relative z-10 flex w-full flex-col items-center px-4 pb-20 pt-48 text-center sm:px-6">
+        <div className="animate-fade relative z-10 flex w-full flex-col items-center px-4 py-16 text-center sm:px-6">
           <span aria-hidden="true" className="block h-14 w-px bg-moon" />
           <Micro tone="moon" className="mt-8 max-w-[44ch]">
             {hero.eyebrow}

@@ -49,3 +49,13 @@ import { Gilda_Display, Hanken_Grotesk, Josefin_Sans } from "next/font/google"
 export const gilda = Gilda_Display({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-gilda" })
 export const josefin = Josefin_Sans({ subsets: ["latin"], display: "swap", variable: "--font-josefin" })
 export const hanken = Hanken_Grotesk({ subsets: ["latin"], display: "swap", variable: "--font-hanken" })
+
+/** Maison type trial — readable high-end serifs. */
+import { Cormorant, DM_Serif_Display, Libre_Bodoni, Marcellus, Newsreader, Playfair_Display, Prata } from "next/font/google"
+export const playfair = Playfair_Display({ subsets: ["latin"], style: ["normal", "italic"], display: "swap", variable: "--font-playfair" })
+export const prata = Prata({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-prata" })
+export const marcellus = Marcellus({ subsets: ["latin"], weight: "400", display: "swap", variable: "--font-marcellus" })
+export const libreBodoni = Libre_Bodoni({ subsets: ["latin"], style: ["normal", "italic"], display: "swap", variable: "--font-libre-bodoni" })
+export const newsreader = Newsreader({ subsets: ["latin"], style: ["normal", "italic"], display: "swap", variable: "--font-newsreader", axes: ["opsz"] })
+export const cormorantDisplay = Cormorant({ subsets: ["latin"], style: ["normal", "italic"], display: "swap", variable: "--font-cormorant-display" })
+export const dmSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], display: "swap", variable: "--font-dm-serif" })
