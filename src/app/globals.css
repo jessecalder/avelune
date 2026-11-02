@@ -44,6 +44,8 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* The sticky section row: 3rem plus its 1px hairline. */
+    scroll-padding-top: calc(3rem + 1px);
     -webkit-text-size-adjust: 100%;
   }
   body {

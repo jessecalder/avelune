@@ -5,7 +5,7 @@ import { Body, H2, Index, Micro, ROMAN, Words } from "./primitives"
 export function HowItWorks() {
   const { howItWorks } = site
   return (
-    <section aria-labelledby="mm-how-title" className="bg-bone py-28 lg:py-44">
+    <section id="how-it-works" aria-labelledby="mm-how-title" className="bg-bone py-28 lg:py-44">
       <Container>
         <div className="reveal text-center">
           <Micro>{howItWorks.eyebrow}</Micro>

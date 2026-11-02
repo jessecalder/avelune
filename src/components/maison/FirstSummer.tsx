@@ -1,13 +1,11 @@
 import { Container } from "@/components/ui"
-import { Photo } from "@/components/Photo"
-import { photos } from "@/content/photos"
 import { site } from "@/content/site"
 import { Body, H2, Index, Micro, NUMERAL, ROMAN, Words } from "./primitives"
 
 export function FirstSummer() {
   const { firstSummer } = site
   return (
-    <section aria-labelledby="mm-summer-title" className="bg-bone">
+    <section id="summer" aria-labelledby="mm-summer-title" className="bg-bone">
       <div className="py-28 lg:py-44">
         <Container>
           <div className="reveal text-center">
@@ -44,9 +42,6 @@ export function FirstSummer() {
             ))}
           </ol>
         </Container>
-      </div>
-      <div className="relative aspect-[4/5] w-full lg:aspect-[21/9]">
-        <Photo photo={photos.longTableOcean} sizes="100vw" />
       </div>
     </section>
   )

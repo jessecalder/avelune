@@ -10,6 +10,7 @@ import { Founding } from "./Founding"
 import { Hero } from "./Hero"
 import { HowItWorks } from "./HowItWorks"
 import { Nav } from "./Nav"
+import { SectionNav } from "./SectionNav"
 
 type Props = {
   /** Display font override for the type trial; the site itself passes nothing. */
@@ -20,6 +21,7 @@ function Sections() {
   return (
     <>
       <Nav />
+      <SectionNav />
       <main id="main">
         <Hero />
         <FirstSummer />

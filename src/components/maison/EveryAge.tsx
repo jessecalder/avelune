@@ -7,7 +7,7 @@ import { Body, H2, Micro, NUMERAL, Words } from "./primitives"
 export function EveryAge() {
   const { everyAge } = site
   return (
-    <section aria-labelledby="mm-age-title" className="bg-bone-deep py-28 lg:py-44">
+    <section id="every-age" aria-labelledby="mm-age-title" className="bg-bone-deep py-28 lg:py-44">
       <Container>
         <div className="reveal text-center">
           <Micro tone="soft">{everyAge.eyebrow}</Micro>

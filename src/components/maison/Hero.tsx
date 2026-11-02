@@ -9,7 +9,7 @@ export function Hero() {
   const { hero } = site
   return (
     <section aria-labelledby="mm-hero-title">
-      <div className="relative flex min-h-[calc(100svh-6rem)] items-center justify-center overflow-hidden bg-ink">
+      <div className="relative flex min-h-[calc(100svh-9rem-2px)] items-center justify-center overflow-hidden bg-ink">
         <div className="absolute inset-0 animate-settle">
           <Photo photo={photos.conchaFromIgueldo} preload sizes="100vw" />
         </div>

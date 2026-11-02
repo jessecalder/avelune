@@ -5,7 +5,7 @@ import { Body, H2, Micro, Words } from "./primitives"
 export function Faq() {
   const { faq } = site
   return (
-    <section aria-labelledby="mm-faq-title" className="bg-bone py-28 lg:py-44">
+    <section id="questions" aria-labelledby="mm-faq-title" className="bg-bone py-28 lg:py-44">
       <Container>
         <div className="mx-auto max-w-[44rem]">
           <div className="reveal text-center">

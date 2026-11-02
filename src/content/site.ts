@@ -55,6 +55,19 @@ export const site = {
     photo: "longTableOcean" satisfies PhotoKey,
   },
 
+  nav: {
+    label: "Sections",
+    items: [
+      { label: "The summer", href: "#summer" },
+      { label: "San Sebastián", href: "#san-sebastian" },
+      { label: "Antigua", href: "#antigua" },
+      { label: "How it works", href: "#how-it-works" },
+      { label: "Every age", href: "#every-age" },
+      { label: "Founding families", href: "#founding" },
+      { label: "Questions", href: "#questions" },
+    ],
+  },
+
   destinations: {
     eyebrow: "Two places, chosen slowly",
     headline: { before: "A coast that eats well. A town under three volcanoes." } as Headline,
