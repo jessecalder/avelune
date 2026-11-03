@@ -46,7 +46,7 @@ export function Hero() {
             source="hero"
             variant="dark"
             cta={hero.cta}
-            className={`mx-auto mt-[clamp(2.5rem,7.5vh,5rem)] w-full max-w-[36rem] text-left ${FORM_DARK} [&_p]:text-bone/90!`}
+            className={`mx-auto mt-[clamp(2.5rem,7.5vh,5rem)] w-full max-w-[36rem] text-left ${FORM_DARK} [&_p]:text-bone/90! [&_button]:bg-moon! [&_button:hover]:bg-bone!`}
           />
         </div>
       </div>

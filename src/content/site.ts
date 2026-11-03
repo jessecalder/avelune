@@ -16,11 +16,11 @@ export const site = {
 
   hero: {
     eyebrow: "Summer 2027 · San Sebastián, Spain · Antigua, Guatemala",
-    headline: { before: "Bring the children. Everything", accent: "else", after: "is handled." } as Headline,
+    headline: { before: "The world is theirs to discover. The summer is", accent: "yours", after: "to enjoy." } as Headline,
     subhead:
-      "Avelune takes six to ten families on one ten-day summer journey: the Basque coast around San Sebastián in July, or the highlands around Antigua, Guatemala, in August. Houses, guides, tables and transfers are arranged. Hosts run the mornings for every age from three to seventeen. Parents get real time off, and every evening ends at one long table.",
+      "Avelune creates thoughtfully curated international summer experiences that bring families together through adventure, cultural discovery, and meaningful connections. While children learn, explore, and make new friends through carefully selected local programs, parents have the freedom to experience the destination in their own way.",
     subheadMobile:
-      "Ten days. Six to ten families. Hosts for every age from three to seventeen. Parents get real time off, and every evening ends at one long table.",
+      "While children learn, explore, and make new friends through carefully selected local programs, parents have the freedom to experience the destination in their own way.",
     cta: "Request early access",
     microcopy:
       "Email only, for now. No pricing yet, no pressure. We will write once, when the first itineraries open, and not otherwise.",
@@ -32,24 +32,24 @@ export const site = {
     eyebrow: "The first summer",
     headline: { before: "Surf lesson at seven. Pintxos at one. Nobody opened a map." } as Headline,
     body:
-      "In summer 2027 Avelune runs its first two journeys: ten days on the Basque coast around San Sebastián in July, and ten days in the highlands around Antigua, Guatemala, in August. Six to ten families on each. One house or small hotel for the whole group, chosen for the children as carefully as for you. A host team that travels with you for all ten days. Every day has the same shape, and the shape is the whole idea.",
+      "In summer 2027 Avelune runs its first two summers: the Basque coast around San Sebastián in June, and the highlands around Antigua, Guatemala, in August, two to four weeks each. Six to ten families on each. Every day has the same shape, and the shape is the whole idea.",
     stats: [
-      { value: "10", label: "days" },
+      { value: "2–4", label: "weeks" },
       { value: "6–10", label: "families" },
       { value: "1", label: "long table" },
     ],
     rhythm: [
       {
         title: "Mornings apart",
-        body: "Kids go with their hosts in age groups: a surf lesson at Zurriola, cacao ground on a stone, a 1912 funicular ridden four times. Parents go wherever grown-ups go when nobody needs them.",
+        body: "Children spend their mornings in local programs chosen for their age: time outdoors, new skills, new friends. Parents go wherever grown-ups go when nobody needs them.",
       },
       {
         title: "Afternoons together, or not",
-        body: "A long lunch on the harbour, a swim, a nap. Some afternoons the group scatters; some it moves as one. Either way, nothing to organise.",
+        body: "Lunch, a swim, a slow hour. Explore together or go your own way; the afternoon is yours to shape.",
       },
       {
         title: "Evenings for everyone",
-        body: "One long table, every family, every age. A cider-house dinner in Astigarraga, a marimba in a colonial courtyard, a walk home through streets you now know. The children eat first and are released; the adults get a second hour.",
+        body: "Dinner somewhere local, a walk home through streets you are starting to know, and now and then a table shared with the families you have met. The children sleep well; the adults get a second hour.",
       },
     ],
     photo: "longTableOcean" satisfies PhotoKey,
@@ -78,7 +78,7 @@ export const site = {
         id: "san-sebastian",
         name: "San Sebastián",
         country: "Spain",
-        when: "July 2027",
+        when: "June 2027",
         surface: "atlantic" as const,
         body:
           "The Basque coast. La Concha for the small ones, Zurriola for the surfers, pintxos counters in the Parte Vieja the teenagers will think they discovered. A wooden funicular up Monte Igueldo that has run since 1912. Grilled turbot in Getaria, txakoli vines on the hills above the sea, Chillida's iron combs where the swell hits Ondarreta.",
@@ -153,60 +153,50 @@ export const site = {
 
   howItWorks: {
     eyebrow: "How Avelune works",
-    headline: { before: "Planned to the minute, so you never look at one." } as Headline,
+    headline: { before: "Your summer, thoughtfully connected." } as Headline,
     body:
       "One booking. One group chat. One person whose job is to know your family's names, ages, allergies and the one thing your middle child refuses to eat. Everything a trip like this needs is handled before you land, and then handled again, live, by people who are travelling with you.",
     pillars: [
       {
-        title: "Everything, handled",
-        body: "A house or small hotel for the whole group, scouted in person. Private transfers, guides, boats, every table, the tickets for the thing that sells out. You receive the full itinerary well before you fly, then a short note each evening with the next day: where, when, what to wear.",
+        title: "Choose your destination",
+        body: "Explore our summer experiences in San Sebastián or Antigua and select the dates that work for your family.",
       },
       {
-        title: "Hosts who know kids",
-        body: "A lead host and a team of counsellors travel with the group for all ten days, one team per age tier. First-aid trained, background-checked, and chosen because children actually like them. They know every child's name by lunch on the first day.",
+        title: "Discover the right program",
+        body: "We help you understand available local programs, age groups, activities, and enrollment options.",
       },
       {
-        title: "Parents' hours, in writing",
-        body: "Blocks of real time off are on the itinerary, not implied. A surf lesson for them is a long lunch for you. The pintxo bars without a stroller. A book on a terrace. The first summer in years you came home rested.",
+        title: "Prepare for your summer",
+        body: "Receive practical program information, schedules, and guidance to help your family prepare.",
       },
       {
-        title: "We travel with you",
-        body: "An Avelune lead is on the ground for the whole journey. Plans change; children change them more. Someone is already on it, and it is never you.",
+        title: "Enjoy the experience",
+        body: "Children participate in their selected programs while parents enjoy the destination at their own pace.",
       },
     ],
   },
 
   everyAge: {
     eyebrow: "Every age, engaged",
-    headline: { before: "Three to seventeen. Nobody gets parked." } as Headline,
-    body:
-      "Resort kids' clubs babysit. The usual failure of family travel is that one age wins: the toddler sets the pace, or the teenager sulks through the cathedral. Avelune plans for four ages at once. Each tier has its own hosts and its own mornings, and the tiers come together when it counts: the beach, the market, the table.",
-    quote:
-      "Somewhere on the second evening a seven-year-old will stop talking mid-sentence and point at the sky. That is the trip.",
+    headline: { before: "Three to fourteen. Every age, its own way." } as Headline,
     tiers: [
       {
         range: "3–5",
-        name: "The Small Ones",
-        body: "Mornings only, then home for lunch and a sleep. Sand, shallow water, a bakery, the funicular, the farm dogs at the finca. Hosts trained in early years, and the calm end of the beach.",
+        name: "Little Explorers",
+        body: "Creative play, early discovery, outdoor activities, and gentle introductions to new environments.",
         photo: "tallGrass" satisfies PhotoKey,
       },
       {
         range: "6–9",
-        name: "The Explorers",
-        body: "Full days with a nap built in. Surf school in white water, a cooking morning with real knives and real supervision, a first volcano, a boat. They come back with stories and sand in their ears.",
+        name: "Adventurers",
+        body: "Active days filled with sports, creative exploration, new skills, and friendships.",
         photo: "surfersWalkingIn" satisfies PhotoKey,
       },
       {
-        range: "10–13",
-        name: "The Crew",
-        body: "Skills, not babysitting. Reading a surf break, a sailing morning on the bay, roasting cacao, a backstrap loom, a market with a small budget and a list. Some independence, always a host in sight.",
+        range: "10–14",
+        name: "Trailblazers",
+        body: "Greater independence, skill-building, outdoor challenges, and cultural discovery.",
         photo: "weaving" satisfies PhotoKey,
-      },
-      {
-        range: "14–17",
-        name: "The Residents",
-        body: "Ten days is long enough to live somewhere, so they do. A pintxos route of their own, a dawn climb to Cerro de la Cruz, a coffee cupping, a say in the evening plan. They will not admit how much they liked it until September.",
-        photo: "fuegoSilhouette" satisfies PhotoKey,
       },
       {
         range: "Parents",
@@ -226,7 +216,7 @@ export const site = {
     perks: [
       {
         title: "First look, six weeks early",
-        body: "The full San Sebastián and Antigua itineraries, with the house, the dates and the price, reach founding families six weeks before anything is public.",
+        body: "The full San Sebastián and Antigua itineraries, with the dates and the price, reach founding families six weeks before anything is public.",
       },
       {
         title: "First pick, held for fourteen days",
@@ -241,8 +231,8 @@ export const site = {
         body: "Invite families you already travel well with. The group forms around you, not around strangers.",
       },
       {
-        title: "A pennant for every child",
-        body: "A small embroidered pennant for every child on the first journeys, with their name and the year. It goes on the bedroom wall and stays there.",
+        title: "Local gifts & photos",
+        body: "A gift for every child, sourced from small businesses and makers in the destination, and a family photo shoot included for every family, so the summer comes home with you.",
       },
     ],
     form: {
@@ -258,7 +248,7 @@ export const site = {
     items: [
       {
         q: "Who is Avelune for?",
-        a: "Families with children between roughly three and seventeen who travel well, are short on planning time, and want their kids to have a summer with other families that none of the parents had to organise. If you have done a resort kids' club and hated it, this is built for you.",
+        a: "Families with children between roughly three and fourteen who travel well, are short on planning time, and want their kids to have a summer with other families that none of the parents had to organise. If you have done a resort kids' club and hated it, this is built for you.",
       },
       {
         q: "Do we travel with strangers?",
@@ -266,7 +256,7 @@ export const site = {
       },
       {
         q: "What is actually included?",
-        a: "Accommodation for the whole group, all transfers in-country, private guides, the children's programme and hosts, every group meal, and every activity on the itinerary. Flights are not included, but we advise on them. Full details come with the itineraries.",
+        a: "All transfers in-country, private guides, the children's programme and hosts, and every activity on the itinerary. Accommodation is not included, but we offer recommendations and guides to help you find the right place to stay. Flights are not included either, but we advise on them. Full details come with the itineraries.",
       },
       {
         q: "Who looks after the children?",
@@ -282,15 +272,11 @@ export const site = {
       },
       {
         q: "When are the trips, and how long?",
-        a: "Summer 2027, ten days each. San Sebastián in July, Antigua in August. You can join one or both. Exact dates go to founding families first.",
+        a: "Summer 2027, two to four weeks each. San Sebastián in June, Antigua in August. You can join one or both. Exact dates go to founding families first.",
       },
       {
         q: "What does it cost?",
         a: "We are not publishing pricing yet. Founding families see it first, with the full plan beside it, and hold places with a fully refundable deposit. Expect the price of a well-run private trip, with the planning and the hosts included.",
-      },
-      {
-        q: "What does early access commit me to?",
-        a: "Nothing. You will receive one email when the itineraries are ready. No charge, no obligation, and no further mail unless you ask for it. If it is not for you, reply once and you are gone.",
       },
       {
         q: "Can grandparents come?",

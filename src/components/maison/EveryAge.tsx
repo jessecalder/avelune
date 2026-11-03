@@ -2,7 +2,7 @@ import { Container } from "@/components/ui"
 import { Photo } from "@/components/Photo"
 import { photos } from "@/content/photos"
 import { site } from "@/content/site"
-import { Body, H2, Micro, NUMERAL, Words } from "./primitives"
+import { H2, Micro, NUMERAL, Words } from "./primitives"
 
 export function EveryAge() {
   const { everyAge } = site
@@ -14,10 +14,6 @@ export function EveryAge() {
           <H2 id="mm-age-title" className="mx-auto mt-8 max-w-[22ch]">
             <Words text={everyAge.headline} />
           </H2>
-          <Body className="mx-auto mt-10 text-center">{everyAge.body}</Body>
-          <blockquote className="mx-auto mt-16 max-w-[32ch] font-display text-[clamp(1.75rem,3.5vw,3rem)] italic leading-[1.2] text-ink lg:mt-24">
-            {everyAge.quote}
-          </blockquote>
         </div>
 
         <ol role="list" className="mx-auto mt-20 max-w-[72rem] lg:mt-28">
