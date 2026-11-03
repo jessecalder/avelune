@@ -41,8 +41,10 @@ See `.env.example`. All optional in development.
 ## Deploy
 
 **Where it runs today.** GitHub `jessecalder/avelune` (branch `main`) deploys automatically to the Railway project
-`avelune` (workspace "jessecalder's Projects"): service `web` plus a `Postgres` service, staging URL
-https://web-production-d11ee.up.railway.app with `SITE_NOINDEX=true` until launch. Variables are managed with
+`avelune` (workspace "jessecalder's Projects"): service `web` plus a `Postgres` service. The site answers at
+https://avelunefamily.com (registered at Cloudflare Registrar, Cloudflare DNS with the two CNAMEs proxied; www redirects
+to the bare domain in `next.config.ts`) and still at https://web-production-d11ee.up.railway.app. `SITE_NOINDEX=true`
+keeps it out of search engines until launch. Variables are managed with
 `railway variable set KEY=value --service web` from this directory (it is linked to the project) or in the Railway
 dashboard. Never paste secrets into chat or commit them: put them in `.env.local` and push them up with the CLI.
 

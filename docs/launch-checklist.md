@@ -6,7 +6,7 @@ already done or can be done on request. Tick as you go.
 ## 1. Name and domain
 
 - [x] Owner (2026-11-02): chose **avelunefamily.com**.
-- [ ] Owner: register avelunefamily.com at Cloudflare Registrar (sold at cost, free WHOIS privacy, Cloudflare DNS, which Railway
+- [x] Owner (2026-11-03): registered avelunefamily.com at Cloudflare Registrar (sold at cost, free WHOIS privacy, Cloudflare DNS, which Railway
   supports for a bare-domain CNAME). Registry check 2026-11-02/03 (RDAP and whois):
   - Taken: avelune.com (parked at GoDaddy/Afternic, for sale: $49,850 buy-now, $1,081/month lease, or offer; renews 2027-03-03),
     avelune.net (a Chilean Minecraft fan server), avelune.co (registered 2026-06-15, GoDaddy; the 2026-10-11 "free" result was wrong),
@@ -23,6 +23,9 @@ already done or can be done on request. Tick as you go.
   - `CNAME` `www` → `48bzslf9.up.railway.app`
   - `TXT` `_railway-verify.www` → `railway-verify=ed8bd4ab8499f79df29e520f14a96097ebd8f80928130d841ac157ae8001cf8c`
   Check with `railway domain status avelunefamily.com --service web`.
+- [x] Owner (2026-11-03): DNS records added (the CNAMEs are proxied, which Railway supports). Railway verified both names and
+  issued certificates within two minutes.
+- [x] Claude (2026-11-03): `NEXT_PUBLIC_SITE_URL=https://avelunefamily.com` set on Railway; https://avelunefamily.com is live.
 - [ ] Owner: trademark check on "Avelune" in the travel and children's services classes (US, EU, Guatemala) before
   paid marketing. A professional search is worth the cost. USPTO, 2026-11-02: no AVELUNE filing in classes 39 or 43, but live
   intent-to-use applications exist in class 16 (art prints, Avelune Living LLC, 99918133), class 14 (jewelry, 99910425) and
