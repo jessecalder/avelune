@@ -136,6 +136,10 @@ export function dbMessage(err: unknown, known: Record<string, string> = {}): str
   }
   const name = pg.constraint_name ?? pg.constraint ?? ""
   if (name && known[name]) return known[name]
+  // The booking_travellers trigger raises check_violation without a constraint name.
+  if (pg.code === "23514" && /does not belong to the family/.test(pg.message ?? "")) {
+    return "That person isn't in this booking's family. Add travellers from the family's own list."
+  }
   switch (pg.code) {
     case "23505":
       return "That would duplicate an existing record."

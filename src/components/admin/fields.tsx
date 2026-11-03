@@ -2,9 +2,10 @@
 
 /**
  * Client form pieces for admin pages. Every form posts to a server action shaped
- * (prev: FormState, formData) => Promise<FormState> and works without JavaScript.
+ * (prev: FormState, formData) => Promise<FormState>. The admin needs JavaScript: its pages
+ * stream in behind Suspense, which stays hidden without it.
  */
-import { useActionState, useEffect, useId, useRef, type ReactNode } from "react"
+import { startTransition, useActionState, useEffect, useId, useRef, type FormEvent, type ReactNode } from "react"
 import { useFormStatus } from "react-dom"
 import { MICRO_CLASS } from "@/components/maison/primitives"
 import { FORM_IDLE, type FormState } from "@/lib/admin/forms"
@@ -35,25 +36,35 @@ export function ActionForm({
   /** Hidden inputs, e.g. { id: row.id }. */
   hidden?: Record<string, string>
 }) {
-  const [state, formAction] = useActionState(action, FORM_IDLE)
+  const [state, formAction, pending] = useActionState(action, FORM_IDLE)
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     if (resetOnSave && state.status === "saved") ref.current?.reset()
   }, [state, resetOnSave])
+  // React resets an uncontrolled <form action> after every submit, which would wipe the owner's
+  // typing when a save fails. Submit by hand so only resetOnSave clears the form.
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const submitter = (e.nativeEvent as SubmitEvent).submitter
+    const data = new FormData(e.currentTarget, submitter instanceof HTMLElement ? submitter : null)
+    startTransition(() => formAction(data))
+  }
   return (
-    <form ref={ref} action={formAction} className={className}>
+    <form ref={ref} action={formAction} onSubmit={onSubmit} className={className}>
       {hidden ? Object.entries(hidden).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />) : null}
       <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">{children}</div>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <SubmitButton>{submitLabel}</SubmitButton>
+        <SubmitButton pending={pending}>{submitLabel}</SubmitButton>
         <StatusLine state={state} />
       </div>
     </form>
   )
 }
 
-export function SubmitButton({ children, quiet = false }: { children: ReactNode; quiet?: boolean }) {
-  const { pending } = useFormStatus()
+/** `pending` overrides the form status, for forms submitted by hand (see ActionForm). */
+export function SubmitButton({ children, quiet = false, pending: pendingProp }: { children: ReactNode; quiet?: boolean; pending?: boolean }) {
+  const { pending: formPending } = useFormStatus()
+  const pending = pendingProp ?? formPending
   return (
     <button type="submit" disabled={pending} aria-busy={pending} className={quiet ? BUTTON_QUIET_CLASS : BUTTON_CLASS}>
       {pending ? "Saving" : children}
@@ -81,7 +92,7 @@ export function StatusLine({ state }: { state: FormState }) {
 
 /**
  * A one-button form for destructive or state-changing actions (delete, mark done). Asks for
- * confirmation in the browser when `confirm` is set; without JS it submits directly.
+ * confirmation in the browser when `confirm` is set.
  */
 export function ActionButton({
   action,

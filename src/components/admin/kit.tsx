@@ -131,7 +131,7 @@ export function ButtonLink({ href, children, quiet = false }: { href: string; ch
   )
 }
 
-/** GET search/filter bar: renders a plain form so filters live in the URL and work without JS. */
+/** GET search/filter bar: renders a plain form so filters live in the URL. */
 export function FilterBar({ action, children }: { action: string; children: ReactNode }) {
   return (
     <form action={action} method="get" className="mt-8 flex flex-wrap items-end gap-4">

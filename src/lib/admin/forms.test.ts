@@ -40,5 +40,6 @@ describe("admin form readers", () => {
       "A family with that email already exists.",
     )
     expect(dbMessage({ code: "P0001", message: "traveller x does not belong" })).toBe("traveller x does not belong")
+    expect(dbMessage({ code: "23514", message: "traveller 1 does not belong to the family of booking 2" })).toMatch(/isn't in this booking's family/)
   })
 })

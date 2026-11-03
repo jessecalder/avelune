@@ -1,6 +1,6 @@
-import { and, eq, inArray, or } from "drizzle-orm"
+import { and, eq, inArray, or, sql } from "drizzle-orm"
 import { getDb } from "../../db/client"
-import { reservations, signups, stripeEvents, type Reservation } from "../../db/schema"
+import { payments, reservations, signups, stripeEvents, type Reservation } from "../../db/schema"
 import type { JourneyId } from "./types"
 
 export type CreateReservationInput = {
@@ -105,7 +105,15 @@ export async function markRefunded(args: {
     .set({ status: "refunded", refundedAt: now, updatedAt: now })
     .where(and(match, inArray(reservations.status, ["pending", "paid"])))
     .returning({ id: reservations.id })
-  if (rows.length > 0) return "updated"
+  if (rows.length > 0) {
+    // A deposit already recorded on a booking (admin "Record on a booking") follows the refund,
+    // so the booking's paid and outstanding figures stay true.
+    await getDb()
+      .update(payments)
+      .set({ status: "refunded", amountRefundedCents: sql`${payments.amountCents}`, refundedAt: now })
+      .where(and(inArray(payments.reservationId, rows.map((r) => r.id)), eq(payments.status, "paid")))
+    return "updated"
+  }
   const [existing] = await getDb()
     .select({ id: reservations.id })
     .from(reservations)
