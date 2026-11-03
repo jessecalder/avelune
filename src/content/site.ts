@@ -11,7 +11,7 @@ export const site = {
   name: "Avelune",
   tagline: "Summer journeys for families",
   pronunciation: "ah-veh-LOON",
-  contactEmail: "hello@avelune.com",
+  contactEmail: "hello@avelunefamily.com",
   foundedYear: 2026,
 
   hero: {

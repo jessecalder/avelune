@@ -5,7 +5,8 @@ already done or can be done on request. Tick as you go.
 
 ## 1. Name and domain
 
-- [ ] Owner: register the domain at Cloudflare Registrar (sold at cost, free WHOIS privacy, Cloudflare DNS, which Railway
+- [x] Owner (2026-11-02): chose **avelunefamily.com**.
+- [ ] Owner: register avelunefamily.com at Cloudflare Registrar (sold at cost, free WHOIS privacy, Cloudflare DNS, which Railway
   supports for a bare-domain CNAME). Registry check 2026-11-02/03 (RDAP and whois):
   - Taken: avelune.com (parked at GoDaddy/Afternic, for sale: $49,850 buy-now, $1,081/month lease, or offer; renews 2027-03-03),
     avelune.net (a Chilean Minecraft fan server), avelune.co (registered 2026-06-15, GoDaddy; the 2026-10-11 "free" result was wrong),
@@ -14,8 +15,14 @@ already done or can be done on request. Tick as you go.
     (travel-industry self-certification, about $115/yr at cost), avelune.family (about $30/yr). Premium status unverified.
   - Avelune names are being registered by others through 2026, so buy the chosen name promptly.
 - [ ] Owner: on Railway the project is on the Hobby plan (2 custom domains per service: the bare domain plus www).
-- [ ] Owner: decide the public contact address. `site.contactEmail` in `src/content/site.ts` currently says hello@avelune.com,
-  which you may not control. Change it (and `EMAIL_FROM`) to the domain you actually own.
+- [x] Claude (2026-11-02): `site.contactEmail` is hello@avelunefamily.com; it works once Email Routing forwards it (step 5).
+- [x] Claude (2026-11-02): avelunefamily.com and www.avelunefamily.com added to the Railway `web` service; www redirects to the
+  bare domain in `next.config.ts`. DNS records to add in Cloudflare after purchase (all DNS only, grey cloud):
+  - `CNAME` `@` → `4nyd8zff.up.railway.app`
+  - `TXT` `_railway-verify` → `railway-verify=fb4313fdddd180b779d362634f034c3062c0ba8edf712122218481ea72246fbc`
+  - `CNAME` `www` → `48bzslf9.up.railway.app`
+  - `TXT` `_railway-verify.www` → `railway-verify=ed8bd4ab8499f79df29e520f14a96097ebd8f80928130d841ac157ae8001cf8c`
+  Check with `railway domain status avelunefamily.com --service web`.
 - [ ] Owner: trademark check on "Avelune" in the travel and children's services classes (US, EU, Guatemala) before
   paid marketing. A professional search is worth the cost. USPTO, 2026-11-02: no AVELUNE filing in classes 39 or 43, but live
   intent-to-use applications exist in class 16 (art prints, Avelune Living LLC, 99918133), class 14 (jewelry, 99910425) and
@@ -50,7 +57,7 @@ already done or can be done on request. Tick as you go.
 
 - [ ] Owner: add the sending domain in Resend and publish its SPF and DKIM records.
 - [ ] Owner: publish a DMARC record (start with `p=none` and a reporting address, tighten later).
-- [ ] Owner: set `EMAIL_FROM` to an address on that domain, for example `Avelune <hello@yourdomain>`.
+- [ ] Owner: set `EMAIL_FROM` to an address on that domain, for example `Avelune <hello@avelunefamily.com>`.
 - [ ] Owner: set `SIGNUP_NOTIFY_EMAIL` to the inbox that should hear about every signup.
 - [ ] Owner: sign up with a personal address and check the welcome email lands in the inbox, not spam.
 

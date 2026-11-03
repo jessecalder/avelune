@@ -50,7 +50,7 @@ The generic steps, for any host:
 
 1. Create a Postgres database and run `DATABASE_URL=... pnpm db:migrate` once.
 2. Set the environment variables above on the host (`NEXT_PUBLIC_SITE_URL` must be the public origin).
-3. Verify the sending domain in Resend and set `EMAIL_FROM` to e.g. `Avelune <hello@avelune.com>`.
+3. Verify the sending domain in Resend and set `EMAIL_FROM` to e.g. `Avelune <hello@avelunefamily.com>`.
 4. Check `GET /api/health`: it returns `{ ok, store, deposits, version, time }`. `store` should read `postgres` in production.
 
 **Railway.** `railway.json` sets the build (`pnpm install --frozen-lockfile && pnpm build`), a `/api/health`
