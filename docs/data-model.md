@@ -1,27 +1,27 @@
 # Avelune data model
 
-Status: operating model added in migrations `0002_operating_model` and `0003_table_comments`. The Drizzle source is `src/db/schema.ts`.
+Status: operating model added in migrations `0002_operating_model` and `0003_table_comments`; private payment links (`payment_links`) added in `0005_payment_links` and `0006_payment_links_comments`. The Drizzle source is `src/db/schema.ts`.
 
 This is the data dictionary for the Avelune database: every table and column, what it is for, who fills it in, and what is private. It is also the reference for anyone pointing a spreadsheet-style admin tool (NocoDB) or custom admin pages at the database.
 
 ## How to read this
 
-- **Stage 1** (live): `signups`. **Stage 2** (built, gated off): `reservations`, `stripe_events`. The eleven tables below the line are the **operating model** that runs the business behind them: customers, travellers, bookings, payments, suppliers, paperwork and a contact log.
+- **Stage 1** (live): `signups`. **Stage 2** (built, gated off): `reservations`, `stripe_events`. The twelve tables below the line are the **operating model** that runs the business behind them: customers, travellers, bookings, payments, suppliers, paperwork and a contact log.
 - The existing app tables (`signups`, `reservations`, `stripe_events`) are not changed. The new tables point at them; nothing points the other way.
-- **Comments live in the database.** Every table, column and the booking sequence has a `COMMENT ON` statement in `drizzle/0003_table_comments.sql` (Drizzle 0.45 has no column-comment API, so they are a custom migration). NocoDB, TablePlus, DBeaver and `psql \d+` all read them. The same text is in the Notes column below. If you add a column, add its comment in a new migration and its row here; `src/db/schema.test.ts` fails if a column has no comment or no row in this file.
-- **Who fills it in.** "Jesse" means by hand, in NocoDB or in a future admin page. "Database" means the database fills it (defaults, sequences, generated columns, triggers): do not type it. "Booking form" means a form that does not exist yet and must not be simulated by hand (see Privacy).
-- **Privacy column.** *Personal* = an adult's contact data. *Booking-stage* = collect only after the privacy page is updated (below). *SENSITIVE (gated)* = children's names, dates of birth, health data: the database refuses it until a consent version is recorded. *Free text* = a notes field: never put health details, children's names or passport numbers in it. *Vendor person* = a private individual or a named person at a supplier.
+- **Comments live in the database.** Every table, column and the booking sequence has a `COMMENT ON` statement in `drizzle/0003_table_comments.sql`, and `payment_links` in `drizzle/0006_payment_links_comments.sql` (Drizzle 0.45 has no column-comment API, so they are custom migrations). NocoDB, TablePlus, DBeaver and `psql \d+` all read them. The same text is in the Notes column below. If you add a column, add its comment in a new migration and its row here; `src/db/schema.test.ts` fails if a column has no comment or no row in this file.
+- **Who fills it in.** "Jesse" means by hand, in NocoDB or in a future admin page. "Database" means the database fills it (defaults, sequences, generated columns, triggers): do not type it. "Booking form" means a form that does not exist yet and must not be simulated by hand (see Privacy). "App" means the Avelune application writes it (admin pages, the customer payment page, the Stripe webhook): do not edit it by hand.
+- **Privacy column.** *Personal* = an adult's contact data. *Booking-stage* = collect only after the privacy page is updated (below). *SENSITIVE (gated)* = children's names, dates of birth, health data: the database refuses it until a consent version is recorded. *Free text* = a notes field: never put health details, children's names or passport numbers in it. *Vendor person* = a private individual or a named person at a supplier. *Capability token* = a secret that grants access to one page on its own.
 
 ## Conventions
 
 - snake_case names; a uuid `id` primary key on every table (`gen_random_uuid()`), so every row has one simple key in a spreadsheet tool.
-- `created_at` and `updated_at` (timestamptz) on every table. On the eleven operating-model tables a database trigger (`set_updated_at`) stamps `updated_at` on every update, so edits made in NocoDB count. The three app tables rely on the app.
+- `created_at` and `updated_at` (timestamptz) on every table. On the twelve operating-model tables a database trigger (`set_updated_at`) stamps `updated_at` on every update, so edits made in NocoDB count. The three app tables rely on the app.
 - Money is an integer in minor units (cents) with a lowercase ISO 4217 `currency` ('usd', 'eur', 'gtq'), enforced by a CHECK. Never floats.
 - Dates the traveller thinks of as calendar days (`starts_on`, `due_on`) are `date`; moments are `timestamptz`.
 - Enums are lowercase snake_case words (age bands are `age_3_5`, not "3–5", so they are easy to type in a filter). 'Derived' states (a full departure, an overdue payment, an expired document) are queries, not stored values, so they cannot go stale.
 - Every foreign key has an explicit ON DELETE rule. Rule of thumb: money, contract and supplier history = RESTRICT (cancel or deactivate, don't delete); pure children = CASCADE; references into the app-owned tables = SET NULL.
 - No polymorphic type/id pairs. `documents` and `interactions` use one nullable foreign key per possible owner and a CHECK that at least one is set.
-- Migrations ship with the next deploy (`pnpm db:migrate && pnpm start`). Migrations 0002 and 0003 only create objects and comments; they alter no existing table or row.
+- Migrations ship with the next deploy (`pnpm db:migrate && pnpm start`). Migrations 0002, 0003, 0005 and 0006 only create objects and comments; they alter no existing table or row.
 
 ## Overview of the relationships
 
@@ -34,6 +34,7 @@ bookings n ── n travellers            via booking_travellers (booking CASCAD
                                       a trigger requires the same family). age_band here = the tier
                                       on this departure.
 bookings 1 ── n payments              (RESTRICT)
+payments 1 ── n payment_links         (CASCADE; at most one live link per payment, the rest are history)
 reservations 1 ── 0..1 payments       (payments.reservation_id, SET NULL; the Stripe Checkout deposit)
 
 vendors 1 ── n vendor_contacts        (CASCADE)
@@ -272,6 +273,41 @@ Keys and rules:
 - CHECK reservation_id only when kind = 'deposit'; CHECK currency is three lowercase letters
 - FK `booking_id` → `bookings.id` ON DELETE RESTRICT
 - FK `reservation_id` → `reservations.id` ON DELETE SET NULL
+
+### `payment_links`
+
+A private pay-by-link for one `payments` row. The family opens `/pay/<token>`, a page linked from nowhere on the site, and pays through Stripe Checkout; the admin sends the link by email and watches this row for progress (sent, opened, at checkout, bank payment clearing). The `payments` row stays the money record: paid and refunded come from `payments.status`, never from here. A payment has at most one live link; cancelled and replaced links stay as history.
+
+- **Filled in by:** the app (the admin pages create and cancel links; the customer page counts opens; the Stripe webhook and the return page record checkout and bank-payment state). Jesse should not edit these by hand.
+- **Privacy:** The token is a capability: anyone holding it can open the payment page for that one payment (family name, journey, dates, booking ref, amount; never children's names, travellers, emails or notes). Keep it out of shared sheets and logs. `email_sent_to` is an adult's email address (personal data, the same address as `families.email` unless edited when sending). The page does not hold card data; Stripe does.
+
+| Column | Type | Null | Default | Filled by | Privacy | Notes |
+|---|---|---|---|---|---|---|
+| `id` | uuid | no | `gen_random_uuid()` | Database |  | Primary key. |
+| `payment_id` | uuid | no |  | App |  | The payment this link collects. CASCADE: a link is only a way to pay and means nothing without its payment. |
+| `token` | text | no |  | App | Capability token | The secret in the link: 32 random bytes, base64url, 43 characters (checked), unique. Anyone holding it can open the payment page, so it is only ever shown to the admin and emailed to the family. |
+| `expires_at` | timestamp with time zone | yes |  | App |  | Optional "link works until". NULL = never expires. After this moment the page says the link is no longer active. |
+| `cancelled_at` | timestamp with time zone | yes |  | App |  | Set when the link is cancelled or replaced by a new one. NULL = live. A partial unique index allows one live link per payment. |
+| `email_sent_at` | timestamp with time zone | yes |  | App |  | Last time the link was emailed to the family, by the app or marked by hand ("I sent it myself"). |
+| `email_sent_to` | text | yes |  | App | Personal | Address of that last send. |
+| `email_send_count` | smallint | no | `0` | App |  | How many times the link has been emailed (sends and hand-marked sends). |
+| `first_opened_at` | timestamp with time zone | yes |  | App |  | First time someone other than the admin opened the page. Email security scanners that pre-fetch links can set this. |
+| `last_opened_at` | timestamp with time zone | yes |  | App |  | Most recent non-admin view. |
+| `open_count` | integer | no | `0` | App |  | Non-admin views of the page. |
+| `checkout_session_id` | text | yes |  | App |  | Latest Stripe Checkout Session (cs_...) created for this link, unique. Cleared when Stripe reports it expired. |
+| `checkout_started_at` | timestamp with time zone | yes |  | App |  | Latest time the family was sent to Stripe checkout. |
+| `processing_since` | timestamp with time zone | yes |  | App |  | Set when a bank payment (ACH and similar) was submitted and has not cleared yet; cleared when it succeeds or fails. While set the page shows "your payment is on its way". |
+| `last_failed_at` | timestamp with time zone | yes |  | App |  | Last time a bank payment through this link failed. The link works again afterwards. |
+| `created_at` | timestamp with time zone | no | `now()` | Database |  | Row creation time. |
+| `updated_at` | timestamp with time zone | no | `now()` | Database |  | Last change (trigger-maintained). |
+
+Keys and rules:
+
+- UNIQUE (token); UNIQUE (checkout_session_id), NULLs allowed
+- UNIQUE (payment_id) WHERE cancelled_at IS NULL: one live link per payment
+- Index on payment_id (the history of a payment's links)
+- CHECK token is 43 base64url characters; CHECK open_count and email_send_count are not negative
+- FK `payment_id` → `payments.id` ON DELETE CASCADE
 
 ### `vendors`
 
@@ -686,7 +722,7 @@ WHERE follow_up_on IS NOT NULL AND follow_up_done_at IS NULL ORDER BY follow_up_
 ## Wiring notes for the Stripe work
 
 - Set `customer_creation: 'always'` on the deposit Checkout Session so `reservations.stripe_customer_id` is populated; copy it to `families.stripe_customer_id` so deposit, instalment invoices and refunds sit on one Stripe customer.
-- Later, extend the webhook to update `payments` by `stripe_payment_intent_id` / `stripe_invoice_id`. The schema already carries both ids and the `reservation_id` link.
+- Payment links: the webhook and the `/pay` return page both record a completed Checkout Session against the `payments` row (matched by the `payment_id` in the session metadata), idempotently, and a refund is matched by `stripe_payment_intent_id`. Invoices (`stripe_invoice_id`) are still not wired.
 
 ## Deliberately not modelled yet
 

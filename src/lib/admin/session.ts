@@ -7,6 +7,13 @@ import { createHmac, timingSafeEqual } from "node:crypto"
  */
 
 export const SESSION_COOKIE = "avelune_admin"
+/**
+ * A copy of the session value scoped to /pay, set and cleared with the session cookie. The admin
+ * cookie never reaches /pay (its path is /admin), and the payment page needs to know when the
+ * viewer is the owner so their own looks are not counted as the family opening the link. It
+ * needs its own name: a response can carry only one cookie per name.
+ */
+export const PAY_PREVIEW_COOKIE = "avelune_admin_pay"
 export const SESSION_TTL_MS = 12 * 60 * 60 * 1000
 export const SESSION_VERSION = 1
 export const MIN_SECRET_LENGTH = 32
@@ -57,4 +64,9 @@ export function sessionCookieOptions(env: Record<string, string | undefined> = p
     path: "/admin",
     maxAge: SESSION_TTL_MS / 1000,
   }
+}
+
+/** The /pay copy of the session cookie: same settings, path /pay. */
+export function payPreviewCookieOptions(env: Record<string, string | undefined> = process.env) {
+  return { ...sessionCookieOptions(env), path: "/pay" }
 }

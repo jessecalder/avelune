@@ -8,18 +8,34 @@ import { Badge, Empty, Facts, LINK_CLASS, Notice, PageHeader, Section, Stat, Tab
 import { getDb } from "@/db/client"
 import { ageBand, bookingTravellers, bookings, departures, families, payments, travellers } from "@/db/schema"
 import { addBookingTravellers, removeBookingTraveller, updateBooking } from "@/lib/admin/actions/bookings"
+import { requestPayment } from "@/lib/admin/actions/payment-links"
 import { addPayment, deletePayment, updatePayment } from "@/lib/admin/actions/payments"
 import { requireAdmin } from "@/lib/admin/auth"
 import { stripePaymentUrl } from "@/lib/admin/stripe-links"
 import { AGE_BAND_LABELS, JOURNEY_LABELS, formatDateTime, formatDay, formatMoney, formatRange, humanize } from "@/lib/admin/format"
 import { isUuid } from "@/lib/admin/forms"
+import { depositTerms } from "@/lib/deposits/config"
+import { linkState } from "@/lib/payments/state"
+import { LinkStateBadge } from "../../payments/LinkStateBadge"
+import { currentMs, loadCurrentLinks } from "../../payments/links"
+import { OVERDUE } from "../../payments/stats"
 import { BookingFields } from "../BookingFields"
 import { PaymentFields } from "../PaymentFields"
+import { RequestPaymentFields } from "../RequestPaymentFields"
 
 export const metadata: Metadata = { title: "Booking" }
 
 const AGE_BAND_OPTIONS = ageBand.enumValues.map((v) => ({ value: v, label: AGE_BAND_LABELS[v] ?? v }))
 
+/** The configured deposit, when it is in the booking's currency. A bad deposit setting just means no suggestion. */
+function standardDeposit(bookingCurrency: string): number | null {
+  try {
+    const terms = depositTerms()
+    return terms.currency === bookingCurrency ? terms.amountCents : null
+  } catch {
+    return null
+  }
+}
 
 export default async function BookingPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin()
@@ -30,9 +46,8 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
   const [booking] = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1)
   if (!booking) notFound()
 
-  // "Today" is Pacific and comes from the database, so the render never reads the clock.
-  const today = sql`(now() at time zone 'America/Los_Angeles')::date`
-  const [[family], [departure], onBooking, candidates, paymentRows] = await Promise.all([
+  // "Today" (Pacific) comes from the database inside OVERDUE, so the render never reads the clock.
+  const [[family], [departure], onBooking, candidates, paymentRows, dueDefault] = await Promise.all([
     db.select({ id: families.id, familyName: families.familyName, email: families.email }).from(families).where(eq(families.id, booking.familyId)).limit(1),
     db.select().from(departures).where(eq(departures.id, booking.departureId)).limit(1),
     db
@@ -61,13 +76,19 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
     db
       .select({
         payment: payments,
-        overdue: sql<boolean>`${payments.status} in ('scheduled', 'invoiced') and ${payments.dueOn} < ${today}`,
+        overdue: sql<boolean>`${OVERDUE}`,
       })
       .from(payments)
       .where(eq(payments.bookingId, id))
       .orderBy(asc(payments.dueOn), asc(payments.createdAt)),
+    // A new payment request is due two weeks from today (Pacific) unless the owner picks another day.
+    db.execute<{ due_on: string }>(sql`select ((now() at time zone 'America/Los_Angeles')::date + 14)::text as due_on`),
   ])
   if (!family || !departure) notFound()
+  const defaultDue = Array.from(dueDefault)[0]?.due_on ?? ""
+  // One query for every payment's link, so the table can say where each one stands.
+  const links = await loadCurrentLinks(paymentRows.map((r) => r.payment.id))
+  const nowMs = currentMs()
 
   // Sums only cover payments in the booking's currency; others are listed but not added in.
   const sameCurrency = paymentRows.filter((r) => r.payment.currency === booking.currency)
@@ -79,6 +100,16 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
     .filter((r) => r.payment.status === "paid" || r.payment.status === "refunded")
     .reduce((sum, r) => sum + r.payment.amountCents - r.payment.amountRefundedCents, 0)
   const outstanding = booking.totalPriceCents === null ? null : booking.totalPriceCents - paidNet
+
+  // What "Request a payment" suggests: the standard deposit, and whatever of the price has no payment against it yet.
+  const depositSuggestion = standardDeposit(booking.currency)
+  const unrequested = booking.totalPriceCents === null ? 0 : booking.totalPriceCents - paidNet - scheduled
+  const balanceSuggestion = unrequested > 0 ? unrequested : null
+  const defaultKind = paymentRows.some((r) => r.payment.kind === "deposit") ? "balance" : "deposit"
+  const suggestions = [
+    depositSuggestion !== null ? `Deposit ${formatMoney(depositSuggestion, booking.currency)}` : null,
+    balanceSuggestion !== null ? `Balance outstanding ${formatMoney(balanceSuggestion, booking.currency)}` : null,
+  ].filter((s): s is string => s !== null)
 
   const pagePath = `/admin/bookings/${id}`
   const tripPath = `/admin/trips/${departure.id}`
@@ -246,7 +277,7 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
         </div>
       </Section>
 
-      <Section title="Payments" description="What the family owes and has paid. Overdue means scheduled or invoiced and past its due date.">
+      <Section title="Payments" description="What the family owes and has paid. Overdue means scheduled or invoiced and past its due date, with no bank payment clearing.">
         <div className="grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4">
           <Stat label="Total price" value={<span className="text-[1.5rem]">{formatMoney(booking.totalPriceCents, booking.currency)}</span>} />
           <Stat label="Scheduled" value={<span className="text-[1.5rem]">{formatMoney(scheduled, booking.currency)}</span>} note="Scheduled and invoiced" />
@@ -267,12 +298,14 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
         <div className="mt-8">
           <Table
             empty="No payments yet."
-            columns={["Due", "Kind", "Label", "Amount", "Status", "Method", "Paid at", "Refunded", "Stripe"]}
+            columns={["Due", "Kind", "Label", "Amount", "Status", "Link", "Method", "Paid at", "Refunded", "Stripe"]}
             rows={paymentRows.map(({ payment: p, overdue }) => [
               <span key="d" className="whitespace-nowrap">
                 {formatDay(p.dueOn)}
               </span>,
-              humanize(p.kind),
+              <Link key="k" href={`/admin/payments/${p.id}`} className={LINK_CLASS}>
+                {humanize(p.kind)}
+              </Link>,
               p.label ?? "—",
               <span key="a" className="whitespace-nowrap tabular-nums">
                 {formatMoney(p.amountCents, p.currency)}
@@ -283,6 +316,7 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
                 </Badge>
                 {overdue ? <Badge tone="strong">Overdue</Badge> : null}
               </span>,
+              <LinkStateBadge key="l" state={linkState(links.get(p.id) ?? null, p, nowMs, booking.status)} />,
               humanize(p.method),
               <span key="pa" className="whitespace-nowrap">
                 {formatDateTime(p.paidAt)}
@@ -325,7 +359,25 @@ export default async function BookingPage({ params }: { params: Promise<{ id: st
             ))}
           </div>
         ) : null}
-        <div className="mt-6">
+        {booking.status === "cancelled" ? null : (
+          <div className="mt-6">
+            <Disclosure summary="Request a payment" open={paymentRows.length === 0}>
+              <p className="mb-5 max-w-[70ch] text-[0.875rem] text-stone">
+                Makes the payment and its private link in one step, then opens the payment so you can email the link. The family
+                pays through Stripe. Amounts are in {booking.currency.toUpperCase()}.
+              </p>
+              <ActionForm action={requestPayment} hidden={{ booking_id: id }} submitLabel="Request payment">
+                <RequestPaymentFields
+                  defaultKind={defaultKind}
+                  defaultAmountCents={defaultKind === "deposit" ? depositSuggestion : balanceSuggestion}
+                  defaultDueOn={defaultDue}
+                  suggestions={suggestions}
+                />
+              </ActionForm>
+            </Disclosure>
+          </div>
+        )}
+        <div className={booking.status === "cancelled" ? "mt-6" : ""}>
           <Disclosure summary="Add a payment">
             <ActionForm action={addPayment} hidden={{ booking_id: id }} resetOnSave submitLabel="Add payment">
               <PaymentFields bookingCurrency={booking.currency} />

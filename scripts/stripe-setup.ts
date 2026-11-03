@@ -17,8 +17,15 @@ import Stripe from "stripe"
 config({ path: ".env.local" })
 config()
 
-const EVENTS = ["checkout.session.completed", "checkout.session.expired", "charge.refunded"] as const
-const DESCRIPTION = "Avelune deposits (scripts/stripe-setup.ts)"
+// async_payment_* settle bank payments (ACH and similar), which complete days after Checkout.
+const EVENTS = [
+  "checkout.session.completed",
+  "checkout.session.expired",
+  "checkout.session.async_payment_succeeded",
+  "checkout.session.async_payment_failed",
+  "charge.refunded",
+] as const
+const DESCRIPTION = "Avelune deposits and payment links (scripts/stripe-setup.ts)"
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(name)

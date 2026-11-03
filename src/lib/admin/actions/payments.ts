@@ -1,11 +1,14 @@
 "use server"
 
-import { eq } from "drizzle-orm"
+import { and, eq, isNotNull, or } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { getDb } from "@/db/client"
-import { bookings, paymentKind, paymentMethod, paymentStatus, payments } from "@/db/schema"
+import { bookings, paymentKind, paymentLinks, paymentMethod, paymentStatus, payments } from "@/db/schema"
 import { requireAdmin } from "@/lib/admin/auth"
 import { cents, currency, date, dbMessage, failed, isUuid, oneOf, pacificDateTime, saved, text, type FormState } from "@/lib/admin/forms"
+import { expireOpenSession } from "@/lib/payments/checkout"
+import { checkoutTermsChanged } from "@/lib/payments/state"
+import { getActiveLink } from "@/lib/payments/store"
 
 const PAYMENT_CONSTRAINTS = {
   payments_amounts_check: "The amount must be more than zero, and the refunded amount can't be negative or more than the amount.",
@@ -100,10 +103,31 @@ async function readPayment(fd: FormData, bookingId: string) {
   }
 }
 
-function refresh(bookingId: string, departureId: string) {
+function refresh(bookingId: string, departureId: string, paymentId?: string) {
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath(`/admin/trips/${departureId}`)
+  revalidatePath("/admin/payments")
+  if (paymentId) revalidatePath(`/admin/payments/${paymentId}`)
 }
+
+/**
+ * Closes a checkout the family has open at a payment's old terms; their next click opens one at
+ * the new. Not a clearing bank payment: that session is already complete. Best effort: the edit is
+ * saved either way, and a session paid at the old amount is recorded with a follow-up.
+ */
+async function closeStaleCheckout(paymentId: string): Promise<void> {
+  try {
+    const link = await getActiveLink(paymentId)
+    if (link?.checkoutSessionId && !link.processingSince) await expireOpenSession(link.checkoutSessionId)
+  } catch (err) {
+    console.error("[payments] could not close the checkout after an edit:", err instanceof Error ? err.message : err)
+  }
+}
+
+const DELETE_MONEY_MOVED =
+  "Money has moved through Stripe for this payment, or a bank payment is clearing, so it can't be deleted. Set its status to cancelled instead (or refunded, once it is refunded in Stripe)."
+const DELETE_IN_CHECKOUT =
+  "The family has gone to Stripe checkout with this payment's link, so it can't be deleted yet. Set its status to cancelled instead: any money that still arrives is then recorded as an extra payment for you to check. Or cancel its link, and delete the payment once Stripe has closed the checkout."
 
 export async function addPayment(_prev: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin()
@@ -139,7 +163,13 @@ export async function updatePayment(_prev: FormState, formData: FormData): Promi
   try {
     const db = getDb()
     const [existing] = await db
-      .select({ bookingId: payments.bookingId, refundedAt: payments.refundedAt })
+      .select({
+        bookingId: payments.bookingId,
+        refundedAt: payments.refundedAt,
+        amountCents: payments.amountCents,
+        currency: payments.currency,
+        status: payments.status,
+      })
       .from(payments)
       .where(eq(payments.id, id))
       .limit(1)
@@ -155,7 +185,8 @@ export async function updatePayment(_prev: FormState, formData: FormData): Promi
         refundedAt: parsed.values.amountRefundedCents > 0 ? (existing.refundedAt ?? new Date()) : null,
       })
       .where(eq(payments.id, id))
-    refresh(bookingId, parsed.departureId)
+    if (checkoutTermsChanged(existing, parsed.values)) await closeStaleCheckout(id)
+    refresh(bookingId, parsed.departureId, id)
     if (parsed.otherCurrency) message += OTHER_CURRENCY_NOTE
   } catch (err) {
     return failed(dbMessage(err, PAYMENT_CONSTRAINTS))
@@ -170,19 +201,43 @@ export async function deletePayment(_prev: FormState, formData: FormData): Promi
   if (!isUuid(id) || !isUuid(bookingId)) return failed("That payment could not be found.")
 
   try {
-    const db = getDb()
-    const [row] = await db
-      .select({ status: payments.status, bookingId: payments.bookingId, departureId: bookings.departureId })
-      .from(payments)
-      .innerJoin(bookings, eq(bookings.id, payments.bookingId))
-      .where(eq(payments.id, id))
-      .limit(1)
-    if (!row || row.bookingId !== bookingId) return failed("That payment no longer exists.")
-    if (row.status === "paid" || row.status === "refunded") {
-      return failed("Paid payments can't be deleted. Mark them refunded or cancelled instead.")
-    }
-    await db.delete(payments).where(eq(payments.id, id))
-    refresh(bookingId, row.departureId)
+    // One transaction under the payment's row lock, the lock a checkout takes first: no checkout can
+    // start between the check and the delete. The links go with the payment (ON DELETE CASCADE).
+    const refused = await getDb().transaction(async (tx) => {
+      const [row] = await tx
+        .select({
+          status: payments.status,
+          bookingId: payments.bookingId,
+          stripeCheckoutSessionId: payments.stripeCheckoutSessionId,
+          stripePaymentIntentId: payments.stripePaymentIntentId,
+        })
+        .from(payments)
+        .where(eq(payments.id, id))
+        .for("update")
+      if (!row || row.bookingId !== bookingId) return "That payment no longer exists."
+      if (row.status === "paid" || row.status === "refunded") {
+        return "Paid payments can't be deleted. Mark them refunded or cancelled instead."
+      }
+      // A session the family may still pay, or a bank payment on its way. Stripe closing an unpaid
+      // session clears checkout_session_id (the checkout.session.expired webhook), so this passes again.
+      const [inCheckout] = await tx
+        .select({ id: paymentLinks.id })
+        .from(paymentLinks)
+        .where(
+          and(
+            eq(paymentLinks.paymentId, id),
+            or(isNotNull(paymentLinks.checkoutSessionId), isNotNull(paymentLinks.processingSince)),
+          ),
+        )
+        .limit(1)
+      if (row.stripePaymentIntentId) return DELETE_MONEY_MOVED
+      if (inCheckout || row.stripeCheckoutSessionId) return DELETE_IN_CHECKOUT
+      await tx.delete(payments).where(eq(payments.id, id))
+      return null
+    })
+    if (refused) return failed(refused)
+    const [booking] = await getDb().select({ departureId: bookings.departureId }).from(bookings).where(eq(bookings.id, bookingId)).limit(1)
+    if (booking) refresh(bookingId, booking.departureId)
   } catch (err) {
     return failed(dbMessage(err))
   }

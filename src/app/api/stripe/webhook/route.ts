@@ -1,6 +1,7 @@
 import { depositTerms } from "@/lib/deposits/config"
 import * as store from "@/lib/deposits/store"
 import { handleStripeEvent } from "@/lib/deposits/webhook"
+import * as payments from "@/lib/payments/fulfil"
 import { getStripe } from "@/lib/stripe"
 
 export async function POST(req: Request) {
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
   try {
     const result = await handleStripeEvent(event, {
       store,
+      payments,
       now: () => new Date(),
       holdDays: depositTerms().holdDays,
     })

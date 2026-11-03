@@ -87,6 +87,21 @@ export function pacificDateTime(fd: FormData, name: string): Date | null | undef
   return new Date(guess - offsetMin * 60_000)
 }
 
+/**
+ * The last millisecond of a calendar date "YYYY-MM-DD" in Pacific time: "works until the end of
+ * that day". An Invalid Date when the text is not a real calendar date.
+ */
+export function pacificEndOfDay(day: string): Date {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day)
+  if (!m) return new Date(NaN)
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])]
+  const wall = new Date(Date.UTC(y, mo - 1, d, 23, 59))
+  if (wall.getUTCFullYear() !== y || wall.getUTCMonth() !== mo - 1 || wall.getUTCDate() !== d) return new Date(NaN)
+  // 23:59 is on the same side of a daylight-saving change as the wall-clock instant it stands for.
+  // The offset is read at the whole minute (it has minute resolution), then the last 59.999 s are added.
+  return new Date(wall.getTime() - pacificOffsetMinutes(wall) * 60_000 + 59_999)
+}
+
 function pacificOffsetMinutes(at: Date): number {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Los_Angeles",

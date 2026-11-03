@@ -9,6 +9,7 @@ export const ADMIN_LINKS = [
   { href: "/admin/signups", label: "Early access" },
   { href: "/admin/families", label: "Families" },
   { href: "/admin/trips", label: "Trips" },
+  { href: "/admin/payments", label: "Payments" },
   { href: "/admin/vendors", label: "Vendors" },
   { href: "/admin/deposits", label: "Deposits" },
 ] as const

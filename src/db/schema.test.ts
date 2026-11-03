@@ -20,6 +20,7 @@ const operatingTables = {
   bookings: schema.bookings,
   booking_travellers: schema.bookingTravellers,
   payments: schema.payments,
+  payment_links: schema.paymentLinks,
   vendors: schema.vendors,
   vendor_contacts: schema.vendorContacts,
   departure_services: schema.departureServices,
@@ -33,7 +34,7 @@ const appTables = {
 }
 
 describe("operating model schema", () => {
-  it("exports the eleven operating-model tables under their SQL names", () => {
+  it("exports the twelve operating-model tables under their SQL names", () => {
     for (const [name, table] of Object.entries(operatingTables)) {
       expect(getTableConfig(table).name).toBe(name)
     }

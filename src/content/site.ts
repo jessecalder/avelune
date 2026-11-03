@@ -370,6 +370,68 @@ export const site = {
     },
   },
 
+  /** Private payment page, /pay/<token>. Linked from nowhere; families reach it from an emailed link. */
+  pay: {
+    metaTitle: "Private payment",
+    eyebrow: "Private payment",
+    titles: {
+      deposit: "Your deposit",
+      balance: "Your balance",
+      instalment: "Your instalment",
+      extra: "Your payment",
+    },
+    labels: {
+      preparedFor: "Prepared for",
+      journey: "Journey",
+      dates: "Dates",
+      booking: "Booking",
+      payment: "Payment",
+      due: "Due",
+      amount: "Amount",
+      paidOn: "Paid",
+      amountPaid: "Amount paid",
+      amountRefunded: "Refunded",
+    },
+    payButton: (amount: string) => `Pay ${amount} securely`,
+    pending: "Opening secure checkout…",
+    secure: "You will finish on Stripe's secure checkout. Avelune never sees your card details.",
+    private: "This link is private to your family. Please don't forward it.",
+    questions: "Questions about this payment? Write to",
+    cancelledNote: "No charge was made. You can pay whenever you are ready.",
+    confirming: "We are confirming your payment with Stripe. Please refresh this page in a moment.",
+    paid: {
+      title: "Thank you.",
+      body: (word: string, amount: string) => `We have received your ${word} of ${amount}.`,
+      // Only for a payment that went through Stripe (the checkout asks Stripe to email a receipt).
+      receipt: "Stripe sends a receipt to the email address on your booking.",
+    },
+    processing: {
+      title: "Your payment is on its way.",
+      body: "Bank payments take a few business days to clear. We will write when it arrives; there is nothing more to do.",
+    },
+    refunded: {
+      title: "This payment was refunded.",
+      body: "If that is unexpected, write to us and a person will reply.",
+    },
+    inactive: {
+      title: "This link is no longer active.",
+      body: "If you still need to make this payment, write to us and we will send a fresh link.",
+    },
+    writeToUs: "Write to us",
+    unavailable: "Online payment is not available right now. Please try again shortly, or write to us.",
+    rateLimited: "Too many attempts from this network. Try again in a few minutes.",
+    testMode: "Test mode · no real money moves",
+    notFound: {
+      title: "We can't find that link.",
+      body: "Please check that the whole link was copied from your email. If it still does not open, write to us and we will send a fresh one.",
+    },
+    error: {
+      title: "Something went wrong on our side.",
+      body: "Please try again in a moment. If it keeps happening, write to us and a person will help.",
+      retry: "Try again",
+    },
+  },
+
   credits: {
     title: "Photo credits",
     intro:

@@ -75,11 +75,14 @@ already done or can be done on request. Tick as you go.
 ## 7. Stripe
 
 - [ ] Owner: create the Stripe account and finish business verification (needs the entity and bank account from step 6).
-- [ ] Owner: copy the test-mode secret key into `STRIPE_SECRET_KEY`. Hand keys over by writing them into `.env.local`
+- [x] Owner: copy the test-mode secret key into `STRIPE_SECRET_KEY`. Hand keys over by writing them into `.env.local`
   in the repo folder (gitignored) and telling Claude, who pushes them to Railway with `railway variable set`; or set them
-  yourself in the Railway dashboard under the `web` service. Never paste keys into chat.
-- [ ] Owner: create a webhook endpoint at `https://<domain>/api/stripe/webhook` subscribed to `checkout.session.completed`,
-  `checkout.session.expired` and `charge.refunded`; copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
+  yourself in the Railway dashboard under the `web` service. Never paste keys into chat. (Test key in, 2026-11-03.)
+- [x] Webhook endpoint at `https://<domain>/api/stripe/webhook`: `pnpm stripe:setup` creates or updates it and pushes
+  `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` to Railway. Events: `checkout.session.completed`,
+  `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`
+  (bank payments through payment links) and `charge.refunded`. Done in test mode 2026-11-03; run it again with the
+  live key at launch (`--rotate` for a fresh signing secret).
 - [ ] Owner: decide the deposit amount, currency and hold length, and set `DEPOSIT_AMOUNT_CENTS`, `DEPOSIT_CURRENCY`,
   `DEPOSIT_HOLD_DAYS`. The default amount of 100000 cents is a placeholder. If the hold length is not fourteen days,
   update the copy in `src/content/site.ts` too (hero, founding perks, FAQ and `deposit` all say fourteen).
@@ -90,6 +93,10 @@ already done or can be done on request. Tick as you go.
   reservation moves to `paid` and then `refunded`.
 - [ ] Owner: when ready to go live, swap in the live secret key and a live-mode webhook secret, set `DEPOSITS_ENABLED=true`,
   and run one real small deposit and refund of your own.
+- [ ] Claude, just before the live keys go in: clear any test-mode Stripe customers saved on families, which live keys
+  cannot use: `UPDATE families SET stripe_customer_id = NULL WHERE stripe_customer_id IS NOT NULL;`. The app no
+  longer saves test-mode customers, and a payment link whose saved customer Stripe rejects forgets it and makes a new
+  one, so this only catches ids stored before that fix.
 
 ## 8. Content and legal
 

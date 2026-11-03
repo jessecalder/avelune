@@ -19,6 +19,19 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // The private payment page is a bearer link: keep it out of search, caches and Referer headers.
+  async headers() {
+    return [
+      {
+        source: "/pay/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      },
+    ]
+  },
   turbopack: {
     rules: {
       "*.css": {

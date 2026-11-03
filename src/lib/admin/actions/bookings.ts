@@ -1,12 +1,13 @@
 "use server"
 
-import { and, eq } from "drizzle-orm"
+import { and, eq, inArray, isNull } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getDb } from "@/db/client"
-import { ageBand, bookingStatus, bookingTravellers, bookings, departures } from "@/db/schema"
+import { ageBand, bookingStatus, bookingTravellers, bookings, departures, paymentLinks, payments } from "@/db/schema"
 import { requireAdmin } from "@/lib/admin/auth"
 import { cents, currency, dbMessage, failed, isUuid, oneOf, pacificDateTime, saved, text, type FormState } from "@/lib/admin/forms"
+import { cancelLink } from "@/lib/payments/store"
 
 const BOOKING_CONSTRAINTS = {
   bookings_active_family_departure_idx: "That family already has an active booking on this departure. Cancel that one first, or open it instead.",
@@ -27,6 +28,33 @@ function readTotal(fd: FormData): { ok: true; value: number | null } | { ok: fal
     return { ok: false, state: failed("Total price must be zero or more, and under 20 million.", "total_price") }
   }
   return { ok: true, value: v }
+}
+
+/**
+ * A cancelled booking's payment links stop working: the live link of each payment still owed is
+ * cancelled, which also closes a Stripe checkout the family may have open. A bank payment already
+ * clearing still lands, and links of paid payments keep showing the family their receipt.
+ * Best effort and after the booking is saved; returns how many links were cancelled.
+ */
+async function cancelBookingLinks(bookingId: string): Promise<number> {
+  try {
+    const live = await getDb()
+      .select({ id: paymentLinks.id })
+      .from(paymentLinks)
+      .innerJoin(payments, eq(payments.id, paymentLinks.paymentId))
+      .where(
+        and(
+          eq(payments.bookingId, bookingId),
+          inArray(payments.status, ["scheduled", "invoiced"]),
+          isNull(paymentLinks.cancelledAt),
+        ),
+      )
+    for (const link of live) await cancelLink(link.id)
+    return live.length
+  } catch (err) {
+    console.error("[payments] could not cancel the links of a cancelled booking:", err instanceof Error ? err.message : err)
+    return 0
+  }
 }
 
 /** A new booking cannot start out cancelled: that needs a reason, which the edit form asks for. */
@@ -97,6 +125,7 @@ export async function updateBooking(_prev: FormState, formData: FormData): Promi
   const cancellationReason = text(formData, "cancellation_reason", 2000)
   if (status === "cancelled" && !cancellationReason) return failed("Give a cancellation reason before cancelling a booking.", "cancellation_reason")
 
+  let message = "Booking saved."
   try {
     const db = getDb()
     const [existing] = await db
@@ -129,13 +158,18 @@ export async function updateBooking(_prev: FormState, formData: FormData): Promi
         notes: text(formData, "notes", 4000),
       })
       .where(eq(bookings.id, id))
+    if (status === "cancelled") {
+      const cancelledLinks = await cancelBookingLinks(id)
+      if (cancelledLinks > 0) message += ` Its live payment ${cancelledLinks === 1 ? "link was" : "links were"} cancelled.`
+      revalidatePath("/admin/payments")
+    }
     revalidatePath(`/admin/trips/${existing.departureId}`)
     revalidatePath(`/admin/families/${existing.familyId}`)
   } catch (err) {
     return failed(dbMessage(err, BOOKING_CONSTRAINTS))
   }
   revalidatePath(`/admin/bookings/${id}`)
-  return saved("Booking saved.")
+  return saved(message)
 }
 
 const TRAVELLER_CONSTRAINTS = {

@@ -9,11 +9,22 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 }
 
-async function send(message: {
+/** Resend is set up: an API key and a From address. */
+export function emailSendingConfigured(): boolean {
+  return !!process.env.RESEND_API_KEY && !!process.env.EMAIL_FROM
+}
+
+/**
+ * Sends one email through Resend from EMAIL_FROM, giving up after a few seconds. Never throws:
+ * the result says whether it went and, if not, why ("not-configured", "provider-error",
+ * "timeout", "error").
+ */
+export async function sendEmail(message: {
   to: string
   subject: string
   text: string
   html: string
+  replyTo?: string
 }): Promise<EmailResult> {
   const key = process.env.RESEND_API_KEY
   const from = process.env.EMAIL_FROM
@@ -25,16 +36,23 @@ async function send(message: {
       timer = setTimeout(() => reject(new Error("timeout")), TIMEOUT_MS)
     })
     const result = await Promise.race([
-      new Resend(key).emails.send({ from, ...message }),
+      new Resend(key).emails.send({
+        from,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+        html: message.html,
+        ...(message.replyTo ? { replyTo: message.replyTo } : {}),
+      }),
       timeout,
     ])
     if (result.error) {
-      console.error("[signups] email send failed:", result.error)
+      console.error("[email] send failed:", result.error)
       return { sent: false, reason: "provider-error" }
     }
     return { sent: true }
   } catch (err) {
-    console.error("[signups] email send failed:", err)
+    console.error("[email] send failed:", err)
     const reason = err instanceof Error && err.message === "timeout" ? "timeout" : "error"
     return { sent: false, reason }
   } finally {
@@ -46,7 +64,7 @@ export async function sendWelcomeEmail(args: {
   to: string
   name?: string
 }): Promise<EmailResult> {
-  return send({
+  return sendEmail({
     to: args.to,
     subject: welcomeEmail.subject,
     text: welcomeEmail.text(args.name),
@@ -64,7 +82,7 @@ export async function notifyOwner(args: {
   const line = `New Avelune signup: ${args.email}${args.name ? ` (${args.name})` : ""}${
     args.source ? ` via ${args.source}` : ""
   }`
-  return send({
+  return sendEmail({
     to,
     subject: "New Avelune signup",
     text: line,

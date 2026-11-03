@@ -128,14 +128,15 @@ export type NewReservation = typeof reservations.$inferInsert
  *
  * Eleven tables that run the business behind the signup list: departures,
  * families, travellers, bookings, payments, vendors, services, documents and
- * a contact log. Column comments (COMMENT ON, read by NocoDB / psql \d+) are
- * in the custom migration "table_comments"; the full data dictionary is
- * docs/data-model.md. Conventions: snake_case, uuid keys, money in integer
- * minor units, lowercase ISO 4217 currency (text + CHECK, like reservations),
- * every table has created_at / updated_at (updated_at is kept current by a
- * database trigger so spreadsheet edits count too), explicit ON DELETE rules:
- * money / contract / supplier history = RESTRICT, pure children = CASCADE,
- * references into the app-owned tables above = SET NULL.
+ * a contact log. A twelfth, payment_links (migration 0005), was added later.
+ * Column comments (COMMENT ON, read by NocoDB / psql \d+) are in the custom
+ * migrations "table_comments" and "payment_links_comments"; the full data
+ * dictionary is docs/data-model.md. Conventions: snake_case, uuid keys, money
+ * in integer minor units, lowercase ISO 4217 currency (text + CHECK, like
+ * reservations), every table has created_at / updated_at (updated_at is kept
+ * current by a database trigger so spreadsheet edits count too), explicit ON
+ * DELETE rules: money / contract / supplier history = RESTRICT, pure children
+ * = CASCADE, references into the app-owned tables above = SET NULL.
  * ======================================================================== */
 
 export const familyStatus = pgEnum("family_status", [
@@ -555,6 +556,60 @@ export const payments = pgTable(
 )
 
 /**
+ * A private pay-by-link for one payments row: the unguessable token the family opens at
+ * /pay/<token>, plus the tracking around it (emailed, opened, at Stripe checkout, bank payment
+ * clearing). The payments row stays the money record; paid and refunded come from its status.
+ * A payment has at most one live link (cancelled_at NULL); a cancelled or replaced link is kept
+ * as history. The token is a capability: whoever holds it can open the page, so it never goes
+ * in a log, a list shared outside the admin, or a Stripe field.
+ */
+export const paymentLinks = pgTable(
+  "payment_links",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    paymentId: uuid("payment_id")
+      .notNull()
+      .references(() => payments.id, { onDelete: "cascade" }),
+    /** 32 random bytes, base64url (43 characters). */
+    token: text("token").notNull(),
+    /** Optional "link works until". NULL = no expiry. */
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    /** Set when the link is cancelled or replaced by a new one. */
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    /** Last time the link was emailed, by the app or marked by hand. */
+    emailSentAt: timestamp("email_sent_at", { withTimezone: true }),
+    emailSentTo: text("email_sent_to"),
+    emailSendCount: smallint("email_send_count").notNull().default(0),
+    /** First view by a non-admin. Email security scanners can count as views. */
+    firstOpenedAt: timestamp("first_opened_at", { withTimezone: true }),
+    lastOpenedAt: timestamp("last_opened_at", { withTimezone: true }),
+    openCount: integer("open_count").notNull().default(0),
+    /** Latest Stripe Checkout Session created for this link. */
+    checkoutSessionId: text("checkout_session_id"),
+    /** Latest time the family was sent to Stripe. */
+    checkoutStartedAt: timestamp("checkout_started_at", { withTimezone: true }),
+    /** A bank payment (ACH and similar) has been submitted and is still clearing. */
+    processingSince: timestamp("processing_since", { withTimezone: true }),
+    /** Last time a bank payment through this link failed. */
+    lastFailedAt: timestamp("last_failed_at", { withTimezone: true }),
+    ...auditColumns(),
+  },
+  (t) => [
+    uniqueIndex("payment_links_token_idx").on(t.token),
+    index("payment_links_payment_id_idx").on(t.paymentId),
+    uniqueIndex("payment_links_active_payment_idx")
+      .on(t.paymentId)
+      .where(sql`cancelled_at IS NULL`),
+    uniqueIndex("payment_links_checkout_session_idx").on(t.checkoutSessionId),
+    check("payment_links_token_check", sql`token ~ '^[A-Za-z0-9_-]{43}$'`),
+    check(
+      "payment_links_counts_check",
+      sql`open_count >= 0 AND email_send_count >= 0`,
+    ),
+  ],
+)
+
+/**
  * Every supplier: houses and hotels, age-tier hosts, guides, transfers,
  * restaurants, activity operators. Individuals (is_individual) are personal
  * data with their own retention.
@@ -797,6 +852,8 @@ export type NewBooking = typeof bookings.$inferInsert
 export type BookingTraveller = typeof bookingTravellers.$inferSelect
 export type Payment = typeof payments.$inferSelect
 export type NewPayment = typeof payments.$inferInsert
+export type PaymentLink = typeof paymentLinks.$inferSelect
+export type NewPaymentLink = typeof paymentLinks.$inferInsert
 export type Vendor = typeof vendors.$inferSelect
 export type NewVendor = typeof vendors.$inferInsert
 export type VendorContact = typeof vendorContacts.$inferSelect

@@ -7,6 +7,8 @@ import { safeNextPath } from "../../../../lib/admin/next-path"
 import { verifyPassword } from "../../../../lib/admin/password"
 import {
   createSessionValue,
+  PAY_PREVIEW_COOKIE,
+  payPreviewCookieOptions,
   SESSION_COOKIE,
   sessionCookieOptions,
 } from "../../../../lib/admin/session"
@@ -54,15 +56,21 @@ export async function login(prev: LoginState, formData: FormData): Promise<Login
     return { status: "error", message: WRONG }
   }
 
-  ;(await cookies()).set(SESSION_COOKIE, createSessionValue(Date.now()), sessionCookieOptions())
+  const jar = await cookies()
+  const value = createSessionValue(Date.now())
+  jar.set(SESSION_COOKIE, value, sessionCookieOptions())
+  // The payment pages' copy, so the owner's own views of a family's link are not counted as opens.
+  jar.set(PAY_PREVIEW_COOKIE, value, payPreviewCookieOptions())
   redirect(next)
 }
 
 /**
- * Clears the cookie. Needs no requireAdmin(): it reads no data and signing out while signed out
+ * Clears the cookies. Needs no requireAdmin(): it reads no data and signing out while signed out
  * is harmless.
  */
 export async function logout(): Promise<void> {
-  ;(await cookies()).set(SESSION_COOKIE, "", { ...sessionCookieOptions(), maxAge: 0 })
+  const jar = await cookies()
+  jar.set(SESSION_COOKIE, "", { ...sessionCookieOptions(), maxAge: 0 })
+  jar.set(PAY_PREVIEW_COOKIE, "", { ...payPreviewCookieOptions(), maxAge: 0 })
   redirect("/admin/login")
 }

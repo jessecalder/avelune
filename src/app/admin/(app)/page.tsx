@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, notInArray, sql } from "drizzle-orm"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Badge, Empty, LINK_CLASS, Table } from "@/components/admin/kit"
+import { Badge, Empty, LINK_CLASS, Stat as MoneyStat, Table } from "@/components/admin/kit"
 import { Micro, NUMERAL } from "@/components/maison/primitives"
 import { getDb } from "@/db/client"
 import {
@@ -18,6 +18,8 @@ import {
 } from "@/db/schema"
 import { requireAdmin } from "@/lib/admin/auth"
 import { JOURNEY_LABELS, formatDay, formatMoney, formatRange, humanize } from "@/lib/admin/format"
+import { CLEARING, STATS_CURRENCY, loadPaymentStats } from "./payments/stats"
+import { tallyNote } from "./payments/summary"
 
 export const metadata: Metadata = { title: "Overview" }
 
@@ -100,6 +102,8 @@ async function loadOperations(today: string) {
         amountCents: payments.amountCents,
         currency: payments.currency,
         dueOn: payments.dueOn,
+        // A bank payment clearing through a payment link: paid, just slow, so never shown as overdue.
+        clearing: sql<boolean>`${CLEARING}`,
       })
       .from(payments)
       .innerJoin(bookings, eq(bookings.id, payments.bookingId))
@@ -140,7 +144,7 @@ async function loadOperations(today: string) {
 async function loadOverview(today: string) {
   const db = getDb()
   const since = new Date(Date.now() - 7 * DAY_MS)
-  const [[total], [recent], byDestination, byStatus, latest, ops] = await Promise.all([
+  const [[total], [recent], byDestination, byStatus, latest, ops, paymentStats] = await Promise.all([
     db.select({ n: count() }).from(signups),
     db.select({ n: count() }).from(signups).where(gte(signups.createdAt, since)),
     db.execute<{ destination: string; n: number }>(
@@ -153,9 +157,11 @@ async function loadOverview(today: string) {
       .orderBy(desc(signups.createdAt))
       .limit(10),
     loadOperations(today),
+    loadPaymentStats(),
   ])
   return {
     ops,
+    paymentStats,
     total: total?.n ?? 0,
     recent: recent?.n ?? 0,
     byDestination: Array.from(byDestination),
@@ -293,6 +299,27 @@ export default async function AdminOverviewPage() {
             )}
           </Section>
 
+          <Section title="Payments">
+            <div className="grid max-w-2xl grid-cols-2 gap-x-8 gap-y-8">
+              <MoneyStat
+                label="Outstanding"
+                value={<span className="text-[1.5rem]">{formatMoney(data.paymentStats.outstanding.cents, STATS_CURRENCY)}</span>}
+                note={tallyNote(data.paymentStats.outstanding)}
+              />
+              <MoneyStat
+                label="Overdue"
+                value={<span className="text-[1.5rem]">{formatMoney(data.paymentStats.overdue.cents, STATS_CURRENCY)}</span>}
+                note={tallyNote(data.paymentStats.overdue)}
+              />
+            </div>
+            <p className="mt-5 text-[0.875rem] text-stone">
+              Scheduled or invoiced family payments, in {STATS_CURRENCY.toUpperCase()}.{" "}
+              <Link href="/admin/payments" className={LINK_CLASS}>
+                All payments
+              </Link>
+            </p>
+          </Section>
+
           <Section title="Payments due in the next 30 days">
             <p className="mb-4 text-[0.875rem] text-stone">Scheduled or invoiced family payments, with anything overdue first.</p>
             {data.ops.paymentsDue.length === 0 ? (
@@ -303,7 +330,7 @@ export default async function AdminOverviewPage() {
                 rows={data.ops.paymentsDue.map((p) => [
                   <span key="d" className="flex flex-col items-start gap-1">
                     <span className="whitespace-nowrap">{formatDay(p.dueOn)}</span>
-                    {p.dueOn < today ? <Badge tone="strong">Overdue</Badge> : null}
+                    {p.dueOn < today && !p.clearing ? <Badge tone="strong">Overdue</Badge> : null}
                   </span>,
                   <Link key="b" href={`/admin/bookings/${p.bookingId}`} className={LINK_CLASS}>
                     {p.bookingRef}
