@@ -5,13 +5,21 @@ already done or can be done on request. Tick as you go.
 
 ## 1. Name and domain
 
-- [ ] Owner: verify the domain situation before buying anything. As of 2026-10-11, avelune.com was registered by a
-  third party in March 2025 and avelune.net in May 2026. avelune.co, avelune.travel and avelune.family showed no
-  registration on 2026-10-11; confirm with a registrar and register the one you want.
+- [ ] Owner: register the domain at Cloudflare Registrar (sold at cost, free WHOIS privacy, Cloudflare DNS, which Railway
+  supports for a bare-domain CNAME). Registry check 2026-11-02/03 (RDAP and whois):
+  - Taken: avelune.com (parked at GoDaddy/Afternic, for sale: $49,850 buy-now, $1,081/month lease, or offer; renews 2027-03-03),
+    avelune.net (a Chilean Minecraft fan server), avelune.co (registered 2026-06-15, GoDaddy; the 2026-10-11 "free" result was wrong),
+    avelune.world, avelune.co.uk, avelune.es, avelunetravel.com (2026-09-10, Cloudflare, Google Workspace mail), getavelune.com, theavelune.com.
+  - Free: avelunejourneys.com, avelunefamily.com, avelunefamilies.com, joinavelune.com, visitavelune.com, avelune.travel
+    (travel-industry self-certification, about $115/yr at cost), avelune.family (about $30/yr). Premium status unverified.
+  - Avelune names are being registered by others through 2026, so buy the chosen name promptly.
+- [ ] Owner: on Railway the project is on the Hobby plan (2 custom domains per service: the bare domain plus www).
 - [ ] Owner: decide the public contact address. `site.contactEmail` in `src/content/site.ts` currently says hello@avelune.com,
   which you may not control. Change it (and `EMAIL_FROM`) to the domain you actually own.
 - [ ] Owner: trademark check on "Avelune" in the travel and children's services classes (US, EU, Guatemala) before
-  paid marketing. A professional search is worth the cost.
+  paid marketing. A professional search is worth the cost. USPTO, 2026-11-02: no AVELUNE filing in classes 39 or 43, but live
+  intent-to-use applications exist in class 16 (art prints, Avelune Living LLC, 99918133), class 14 (jewelry, 99910425) and
+  class 10 (beauty devices, 50036888). An attorney should clear the name and file in classes 39 and 43.
 
 ## 2. DNS
 
