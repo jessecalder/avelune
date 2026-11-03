@@ -13,7 +13,8 @@ export type SignupFormProps = {
   /** Surface the form sits on; controls field and button colours. */
   variant: "dark" | "light"
   cta: string
-  microcopy: string
+  /** Small print under the form; omit to show none. */
+  microcopy?: string
   className?: string
 }
 
@@ -84,7 +85,7 @@ export function SignupForm({ source, variant, cta, microcopy, className = "" }: 
             inputMode="email"
             placeholder={site.signup.emailPlaceholder}
             aria-invalid={hasError}
-            aria-describedby={hasError ? `${errorId} ${microId}` : microId}
+            aria-describedby={[hasError ? errorId : null, microcopy ? microId : null].filter(Boolean).join(" ") || undefined}
             className={`h-14 w-full border bg-transparent px-4 focus:outline-none ${inputCls}`}
           />
         </div>
@@ -106,9 +107,11 @@ export function SignupForm({ source, variant, cta, microcopy, className = "" }: 
           {state.message}
         </p>
       ) : null}
-      <p id={microId} className={`mt-3 text-[0.8125rem] leading-[1.5] ${dark ? "text-bone/70" : "text-stone"}`}>
-        {microcopy}
-      </p>
+      {microcopy ? (
+        <p id={microId} className={`mt-3 text-[0.8125rem] leading-[1.5] ${dark ? "text-bone/70" : "text-stone"}`}>
+          {microcopy}
+        </p>
+      ) : null}
     </form>
   )
 }
