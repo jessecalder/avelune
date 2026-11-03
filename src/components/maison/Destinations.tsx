@@ -2,14 +2,15 @@ import { Container } from "@/components/ui"
 import { Photo } from "@/components/Photo"
 import { photos } from "@/content/photos"
 import { site } from "@/content/site"
-import { H1_CLASS, Index, Micro, ROMAN } from "./primitives"
+import { H1_CLASS, Index, MICRO_CLASS, ROMAN } from "./primitives"
 
 type Place = (typeof site.destinations.places)[number]
 
-/* Literal class strings so Tailwind can see them. */
+/* Literal class strings so Tailwind can see them. The scrim only covers the text block at the
+ * bottom of the photograph and is transparent above it, so the image stays bright. */
 const SURFACE = {
-  atlantic: { bg: "bg-atlantic", scrim: "from-atlantic/90 via-atlantic/70" },
-  cacao: { bg: "bg-cacao", scrim: "from-cacao/90 via-cacao/70" },
+  atlantic: { bg: "bg-atlantic", scrim: "from-atlantic/90 via-atlantic/60 via-50%" },
+  cacao: { bg: "bg-cacao", scrim: "from-cacao/90 via-cacao/60 via-50%" },
 } as const
 
 function ChapterPhoto({ id }: { id: Place["id"] }) {
@@ -40,15 +41,15 @@ function Chapter({ place, index }: { place: Place; index: number }) {
     <section id={place.id} aria-labelledby={titleId}>
       <div className="relative flex min-h-[100svh] items-end justify-center overflow-hidden">
         <ChapterPhoto id={place.id} />
-        <div aria-hidden="true" className={`absolute inset-0 bg-linear-to-t ${surface.scrim} via-50% to-transparent`} />
-        <div className="relative z-10 w-full px-4 pb-20 pt-40 text-center sm:px-6">
-          <Index className="text-[5rem] text-moon/80">{ROMAN[index]}</Index>
+        <div aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-[26rem] max-h-[70%] bg-linear-to-t ${surface.scrim} to-transparent`} />
+        <div className="relative z-10 w-full px-4 pb-20 pt-40 text-center [text-shadow:0_1px_2px_rgb(0_0_0/0.3),0_0_30px_rgb(0_0_0/0.35)] sm:px-6">
+          <Index className="text-[5rem] text-moon">{ROMAN[index]}</Index>
           <h2 id={titleId} className={`${H1_CLASS} mt-6 text-bone`}>
             {place.name}
           </h2>
-          <Micro tone="moon" className="mt-8">
+          <p className={`${MICRO_CLASS} mt-8 text-bone`}>
             {place.when} · {place.country}
-          </Micro>
+          </p>
         </div>
       </div>
 
