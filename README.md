@@ -23,6 +23,7 @@ Without `DATABASE_URL`, signups are appended to `.data/signups.jsonl` (gitignore
 | `pnpm db:generate` | Regenerate SQL migrations from `src/db/schema.ts` |
 | `pnpm db:migrate` | Apply migrations in `drizzle/` to `DATABASE_URL` |
 | `pnpm signups:export > signups.csv` | Dump signups (Postgres or the local file) as CSV |
+| `pnpm admin:set-password` | Set the owner password for `/admin` (Railway, or `--local` for `.env.local`) |
 
 ## Environment
 
@@ -37,6 +38,7 @@ See `.env.example`. All optional in development.
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for Open Graph tags and Stripe return URLs. |
 | `DEPOSITS_ENABLED`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Turn on refundable deposits; see Deposits below. |
 | `DEPOSIT_AMOUNT_CENTS`, `DEPOSIT_CURRENCY`, `DEPOSIT_HOLD_DAYS` | Deposit terms (placeholder defaults: 100000, usd, 14). |
+| `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` | Owner login for `/admin`. Set both with `pnpm admin:set-password`; see Admin below. |
 
 ## Deploy
 
@@ -105,6 +107,27 @@ completion is matched by the reservation id in the charge metadata or retried by
 Each event id is stored in `stripe_events`, so Stripe's retries are safe. Refunds are issued from the Stripe
 dashboard; the webhook only records them. The pages are `/deposit`, `/deposit/success` and `/deposit/cancelled`,
 all `noindex`, and `/deposit` shows the "not open yet" copy whenever deposits are disabled or unconfigured.
+
+## Admin
+
+`/admin` is an owner-only area (overview now; early access, families, trips, vendors and deposits pages come later).
+There is no third-party auth service: one owner password, stored as a scrypt hash, and a signed 12-hour cookie.
+Admin is disabled until
+both `ADMIN_PASSWORD_HASH` and `ADMIN_SESSION_SECRET` (at least 32 characters) exist: the login page then says "Admin is not set up yet." and nothing signs in.
+Sign-in attempts are limited to 5 per 15 minutes per network, and to 100 wrong passwords per 15 minutes in total.
+If you are ever shown "Too many attempts", wait 15 minutes or restart the `web` service (the counters live in memory).
+
+```bash
+pnpm admin:set-password            # prompts twice (14+ characters, echo off), pushes both variables to Railway
+pnpm admin:set-password --local    # writes them to .env.local instead
+pnpm admin:set-password --keep-session   # change the password but keep everyone signed in
+```
+
+The script never prints the values; redeploy afterwards (`railway redeploy --service web`). A new session secret
+signs out every session, which is also how to revoke access quickly. Then sign in at `/admin/login` (for example
+https://avelunefamily.com/admin). The area is `noindex`, disallowed in `robots.txt`, and never cached. Login is rate
+limited (5 attempts per IP and 30 overall per 15 minutes, per process). `src/proxy.ts` is only the first gate: every
+admin page that reads data and every admin server action calls `requireAdmin()` from `src/lib/admin/auth.ts`.
 
 ## How the site is put together
 

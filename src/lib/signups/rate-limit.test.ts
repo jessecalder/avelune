@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest"
 import { createRateLimiter } from "./rate-limit"
 
+describe("blocked", () => {
+  it("reports exhaustion without recording a hit", () => {
+    let t = 0
+    const rl = createRateLimiter({ limit: 2, windowMs: 1000, now: () => t })
+    expect(rl.blocked("k")).toBe(false)
+    rl.check("k")
+    expect(rl.blocked("k")).toBe(false)
+    rl.check("k")
+    expect(rl.blocked("k")).toBe(true)
+    t = 1001
+    expect(rl.blocked("k")).toBe(false)
+  })
+})
+
 describe("createRateLimiter", () => {
   it("blocks after the limit and recovers once the window rolls over", () => {
     let t = 1_000

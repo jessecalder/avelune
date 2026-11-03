@@ -17,6 +17,11 @@ export function createRateLimiter({
   const hits = new Map<string, number[]>()
 
   return {
+    /** True when `key` has used its budget in the current window. Records nothing. */
+    blocked(key: string): boolean {
+      const cutoff = now() - windowMs
+      return (hits.get(key) ?? []).filter((s) => s > cutoff).length >= limit
+    },
     check(key: string): { ok: boolean; retryAfterMs: number } {
       const t = now()
       const cutoff = t - windowMs

@@ -19,6 +19,7 @@ Next.js 16.4 (App Router, Turbopack, **cacheComponents on**), React 19.3, TypeSc
 - zod 4: `z.email()`, `{ error: '…' }`, `safeParse`.
 - Drizzle: `postgres(url, { prepare: false })`; `pnpm db:generate` needs no DB.
 - `next build` does not lint; run `pnpm lint`.
+- Admin auth = owner password (scrypt hash in `ADMIN_PASSWORD_HASH`) + HMAC-signed cookie (`ADMIN_SESSION_SECRET`); `src/proxy.ts` is only the first gate, so every admin data read and server action calls `requireAdmin()` itself (`src/lib/admin/auth.ts`).
 
 ## Content rules
 - Copy in `src/content/site.ts`, photos in `src/content/photos.ts`. Components never hard-code marketing copy.
