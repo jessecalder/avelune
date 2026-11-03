@@ -15,6 +15,27 @@
       "when": 1791783416430,
       "tag": "0001_yellow_moonstone",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793667361367,
+      "tag": "0002_operating_model",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793667363220,
+      "tag": "0003_table_comments",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793668091434,
+      "tag": "0004_ops_fixes",
+      "breakpoints": true
     }
   ]
 }
