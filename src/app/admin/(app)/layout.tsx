@@ -2,7 +2,7 @@ import { Suspense, type ReactNode } from "react"
 import { Container } from "@/components/ui"
 import { MICRO_CLASS } from "@/components/maison/primitives"
 import { logout } from "../(auth)/login/actions"
-import { AdminNav } from "./AdminNav"
+import { AdminNav, AdminNavLinks } from "./AdminNav"
 
 /**
  * Static chrome only: it reads no cookies, so it prerenders. Pages read the session themselves
@@ -28,7 +28,9 @@ export default function AdminAppLayout({ children }: { children: ReactNode }) {
             </form>
           </div>
           <div className="pb-5">
-            <AdminNav />
+            <Suspense fallback={<AdminNavLinks pathname={null} />}>
+              <AdminNav />
+            </Suspense>
           </div>
         </Container>
       </header>

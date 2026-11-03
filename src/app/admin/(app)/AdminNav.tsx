@@ -13,12 +13,13 @@ export const ADMIN_LINKS = [
   { href: "/admin/deposits", label: "Deposits" },
 ] as const
 
-export function AdminNav() {
-  const pathname = usePathname()
+/** The nav links; `pathname` marks the current section (null while it is not known yet). */
+export function AdminNavLinks({ pathname }: { pathname: string | null }) {
   return (
     <nav aria-label="Admin" className="-mx-1 flex flex-wrap gap-x-6 gap-y-1">
       {ADMIN_LINKS.map((link) => {
-        const current = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href)
+        const current =
+          pathname !== null && (link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href))
         return (
           <Link
             key={link.href}
@@ -34,4 +35,12 @@ export function AdminNav() {
       })}
     </nav>
   )
+}
+
+/**
+ * usePathname() is request data on dynamic routes under cacheComponents, so the layout renders
+ * this inside <Suspense> with <AdminNavLinks pathname={null} /> as the fallback.
+ */
+export function AdminNav() {
+  return <AdminNavLinks pathname={usePathname()} />
 }
