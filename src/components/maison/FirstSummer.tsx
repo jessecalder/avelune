@@ -21,7 +21,7 @@ export function FirstSummer() {
               <li key={stat.label} className="contents">
                 {i > 0 ? <span aria-hidden="true" className="h-16 w-px shrink-0 bg-mist" /> : null}
                 <div className="text-center">
-                  <p className={`${NUMERAL} text-[4rem] text-ink lg:text-[6rem]`}>{stat.value}</p>
+                  <p className={`${NUMERAL} whitespace-nowrap text-[2.75rem] text-ink sm:text-[4rem] lg:text-[6rem]`}>{stat.value}</p>
                   <Micro tone="stone" className="mt-4">
                     {stat.label}
                   </Micro>
