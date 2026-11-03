@@ -71,7 +71,13 @@ Point the Stripe webhook at the production domain, not a preview URL.
 Founding families can hold a place with a refundable Stripe Checkout deposit. It is off by default and needs
 Postgres: the `reservations` and `stripe_events` tables come from `pnpm db:migrate`.
 
-Enable it in Stripe test mode:
+**Wiring a Stripe account (staging or production).** Put the secret key in `.env.local` as `STRIPE_SECRET_KEY`, then run
+`pnpm stripe:setup` (or `--dry-run` first). It checks the account, registers the webhook endpoint at
+`https://avelunefamily.com/api/stripe/webhook` with the three events below, and pushes `STRIPE_SECRET_KEY` and
+`STRIPE_WEBHOOK_SECRET` to the Railway `web` service without printing either. `--rotate` replaces the endpoint to get a
+fresh signing secret; `--url` targets another origin. Then set the `DEPOSIT_*` variables and `DEPOSITS_ENABLED=true`.
+
+Enable it locally in Stripe test mode:
 
 1. In the Stripe dashboard, switch to test mode and copy the secret key into `STRIPE_SECRET_KEY`.
 2. Set `DEPOSITS_ENABLED=true`, `DATABASE_URL` and `NEXT_PUBLIC_SITE_URL=http://localhost:3000`. Optionally set
